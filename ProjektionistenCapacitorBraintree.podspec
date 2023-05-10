@@ -9,9 +9,10 @@ Pod::Spec.new do |s|
   s.license = package['license']
   s.homepage = 'https://capacitorjs.com'
   s.author = package['author']
-  s.source = { :git => 'https://github.com/ionic-team/capacitor-plugins.git', :tag => package['name'] + '@' + package['version'] }
-  s.source_files = 'ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}', 'share/ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}'
+  s.source = { :git => 'https://bitbucket.org/projektionisten-developers/capacitor-braintree.git', :tag => package['name'] + '@' + package['version'] }
+  s.source_files = 'ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}'
   s.ios.deployment_target  = '13.0'
   s.dependency 'Capacitor'
+  s.dependency 'BraintreeDropIn', '9.8.2'
   s.swift_version = '5.1'
 end

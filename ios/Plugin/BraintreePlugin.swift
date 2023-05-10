@@ -7,7 +7,7 @@ public class BraintreePlugin: CAPPlugin {
 
     private var clientTokenOrTokenizationKey: String = ""
 
-    @objc func canBraintree(_ call: CAPPluginCall) {
+    /*@objc func canBraintree(_ call: CAPPluginCall) {
         call.resolve([
             "value": true
         ])
@@ -69,6 +69,7 @@ public class BraintreePlugin: CAPPlugin {
             self?.bridge?.viewController?.present(actionController, animated: true, completion: nil)
         }
     }
+    }*/
 
      @objc func setClientToken(_ call: CAPPluginCall) {
         if let token: String = call.getString("token") {
@@ -88,7 +89,7 @@ public class BraintreePlugin: CAPPlugin {
             let currencyCode = call.getString("currencyCode"),
             let countryCode = call.getString("countryCode") {
 
-             // implementation.setupApplePay(merchantId: merchantId, currencyCode: currencyCode, countryCode: countryCode)
+             // TODO setting up apple pay request for drop in ui
          }
 
         call.resolve([
@@ -97,24 +98,40 @@ public class BraintreePlugin: CAPPlugin {
     }
 
      @objc func presentDropInPaymentUI(_ call: CAPPluginCall) {
-
+         // Setup empty dictionary to contain the PaymentUIResults
+         var paymentResult: Dictionary<String, Any> = [:]
+         
          if self.clientTokenOrTokenizationKey != "" {
              DispatchQueue.main.async {
                  let request =  BTDropInRequest()
                  let dropIn = BTDropInController(authorization: self.clientTokenOrTokenizationKey, request: request) { (controller, result, error) in
                      if (error != nil) {
                          print("ERROR")
+                         call.reject("Error in Drop-in payment")
                      } else if (result?.isCanceled == true) {
-                         print("CANCELED")
-                     } else if let result = result {
-                         // Use the BTDropInResult properties to update your UI
-                         // result.paymentMethodType
-                         // result.paymentMethod
-                         // result.paymentIcon
-                         // result.paymentDescription
                          call.resolve([
-                            "value": true
+                            "userCancelled": true
                          ])
+                     } else if let result = result {
+                         
+                         paymentResult["nonce"] = result.paymentMethod?.nonce
+                         paymentResult["userCancelled"] = result.isCanceled
+                         
+                         if (result.paymentMethodType == BTDropInPaymentMethodType.visa || result.paymentMethodType == BTDropInPaymentMethodType.masterCard
+                             || result.paymentMethodType == BTDropInPaymentMethodType.AMEX) {
+                             paymentResult["card"] = [
+                                "lastTwo": result.paymentDescription.suffix(2),
+                                "network": result.paymentMethodType
+                             ] as [String : Any]
+                         }
+                         
+                         if (result.paymentMethodType == BTDropInPaymentMethodType.payPal) {
+                             paymentResult["paypalAccount"] = [
+                                "email": result.paymentDescription
+                             ]
+                         }
+                         
+                         call.resolve(paymentResult)
                      }
                      controller.dismiss(animated: true, completion: nil)
                  }

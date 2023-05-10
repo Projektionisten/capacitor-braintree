@@ -7,14 +7,7 @@ def capacitor_pods
   pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
 end
 
-def braintree_pods
-  pod 'BraintreeDropIn'
-end
-
 target 'Plugin' do
   capacitor_pods
-end
-
-target 'App' do
-  braintree_pods
+  pod 'BraintreeDropIn'
 end
