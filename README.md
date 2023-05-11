@@ -38,8 +38,7 @@ If you want to enable GooglePay, you also need to add this meta tag to the appli
 
 <docgen-index>
 
-* [`initialize(...)`](#initialize)
-* [`setClientToken(...)`](#setClientToken)
+* [`setClientToken(...)`](#setclienttoken)
 * [`setupApplePay(...)`](#setupapplepay)
 * [`presentDropInPaymentUI(...)`](#presentdropinpaymentui)
 * [Interfaces](#interfaces)
@@ -48,24 +47,6 @@ If you want to enable GooglePay, you also need to add this meta tag to the appli
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
-
-### initialize(...)
-
-```typescript
-initialize(options: TokenOptions) => Promise<void>
-```
-
---- iOS Only ---
-Used to initialize the Braintree client.
-
-The client must be initialized before other methods can be used.
-
-| Param         | Type                                                  |
-| ------------- | ----------------------------------------------------- |
-| **`options`** | <code><a href="#tokenoptions">TokenOptions</a></code> |
-
---------------------
-
 
 ### setClientToken(...)
 
@@ -144,17 +125,17 @@ Options for the setupApplePay method.
 
 Successful callback result for the presentDropInPaymentUI method.
 
-| Prop                       | Type                                                                                                                                                                            | Description                                                                                      |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| **`userCancelled`**        | <code>boolean</code>                                                                                                                                                            | Indicates if the user used the cancel button to close the dialog without completing the payment. |
-| **`nonce`**                | <code>string</code>                                                                                                                                                             | The nonce for the payment transaction (if a payment was completed).                              |
-| **`type`**                 | <code>string</code>                                                                                                                                                             | The payment type (if a payment was completed).                                                   |
-| **`localizedDescription`** | <code>string</code>                                                                                                                                                             | A description of the payment method (if a payment was completed).                                |
-| **`card`**                 | <code>{ lastTwo: string; network: string; }</code>                                                                                                                              | Information about the credit card used to complete a payment (if a credit card was used).        |
-| **`payPalAccount`**        | <code>{ email: string; firstName: string; lastName: string; phone: string; billingAddress: string; shippingAddress: string; clientMetadataId: string; payerId: string; }</code> | Information about the PayPal account used to complete a payment (if a PayPal account was used).  |
-| **`applePaycard`**         | <code>{}</code>                                                                                                                                                                 | Information about the Apple Pay card used to complete a payment (if Apple Pay was used).         |
-| **`threeDSecureCard`**     | <code>{ liabilityShifted: boolean; liabilityShiftPossible: boolean; }</code>                                                                                                    | Information about 3D Secure card used to complete a payment (if 3D Secure was used).             |
-| **`venmoAccount`**         | <code>{ username: string; }</code>                                                                                                                                              | Information about Venmo account used to complete a payment (if a Venmo account was used).        |
+| Prop                       | Type                                                                                                                                                                                   | Description                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **`userCancelled`**        | <code>boolean</code>                                                                                                                                                                   | Indicates if the user used the cancel button to close the dialog without completing the payment. |
+| **`nonce`**                | <code>string</code>                                                                                                                                                                    | The nonce for the payment transaction (if a payment was completed).                              |
+| **`type`**                 | <code>string</code>                                                                                                                                                                    | The payment type (if a payment was completed).                                                   |
+| **`localizedDescription`** | <code>string</code>                                                                                                                                                                    | A description of the payment method (if a payment was completed).                                |
+| **`card`**                 | <code>{ lastTwo: string; network: string; }</code>                                                                                                                                     | Information about the credit card used to complete a payment (if a credit card was used).        |
+| **`payPalAccount`**        | <code>{ email: string; firstName?: string; lastName?: string; phone?: string; billingAddress?: string; shippingAddress?: string; clientMetadataId?: string; payerId?: string; }</code> | Information about the PayPal account used to complete a payment (if a PayPal account was used).  |
+| **`applePaycard`**         | <code>{}</code>                                                                                                                                                                        | Information about the Apple Pay card used to complete a payment (if Apple Pay was used).         |
+| **`threeDSecureCard`**     | <code>{ liabilityShifted: boolean; liabilityShiftPossible: boolean; }</code>                                                                                                           | Information about 3D Secure card used to complete a payment (if 3D Secure was used).             |
+| **`venmoAccount`**         | <code>{ username: string; }</code>                                                                                                                                                     | Information about Venmo account used to complete a payment (if a Venmo account was used).        |
 
 
 #### PaymentUIOptions
@@ -166,5 +147,6 @@ Options for the presentDropInPaymentUI method.
 | **`amount`**             | <code>string</code> | The amount of the transaction to show in the drop-in UI on the summary row as well as the call to action button. |
 | **`primaryDescription`** | <code>string</code> | The description of the transaction to show in the drop-in UI on the summary row.                                 |
 | **`email`**              | <code>string</code> | The account email of the user for GooglePay, 3d secure etc                                                       |
+| **`selector`**           | <code>string</code> | --- WEB ONLY --- HTML Selector of the element the dropin should insert itself into                               |
 
 </docgen-api>

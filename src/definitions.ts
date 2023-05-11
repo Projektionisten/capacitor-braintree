@@ -43,12 +43,18 @@ export interface PaymentUIOptions {
    * The description of the transaction to show in the drop-in UI on the
    * summary row.
    */
-  primaryDescription: string;
+  primaryDescription?: string;
 
   /**
    * The account email of the user for GooglePay, 3d secure etc
    */
-  email: string;
+  email?: string;
+
+  /**
+   * --- WEB ONLY ---
+   * HTML Selector of the element the dropin should insert itself into
+   */
+  selector?: string;
 }
 
 /**
@@ -70,17 +76,17 @@ export interface PaymentUIResult {
   /**
    * The payment type (if a payment was completed).
    */
-  type: string;
+  type?: string;
 
   /**
    * A description of the payment method (if a payment was completed).
    */
-  localizedDescription: string;
+  localizedDescription?: string;
 
   /**
    * Information about the credit card used to complete a payment (if a credit card was used).
    */
-  card: {
+  card?: {
 
       /**
        * The last two digits of the credit card used.
@@ -112,27 +118,27 @@ export interface PaymentUIResult {
   /**
    * Information about the PayPal account used to complete a payment (if a PayPal account was used).
    */
-  payPalAccount: {
+  payPalAccount?: {
       email: string;
-      firstName: string;
-      lastName: string;
-      phone: string;
-      billingAddress: string;
-      shippingAddress: string;
-      clientMetadataId: string;
-      payerId: string;
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      billingAddress?: string;
+      shippingAddress?: string;
+      clientMetadataId?: string;
+      payerId?: string;
   };
 
   /**
    * Information about the Apple Pay card used to complete a payment (if Apple Pay was used).
    */
-  applePaycard: {
+  applePaycard?: {
   };
 
   /**
    * Information about 3D Secure card used to complete a payment (if 3D Secure was used).
    */
-  threeDSecureCard: {
+  threeDSecureCard?: {
       liabilityShifted: boolean;
       liabilityShiftPossible: boolean;
   };
@@ -140,7 +146,7 @@ export interface PaymentUIResult {
   /**
    * Information about Venmo account used to complete a payment (if a Venmo account was used).
    */
-  venmoAccount: {
+  venmoAccount?: {
       username: string;
   };
 }
@@ -169,4 +175,7 @@ export interface BraintreePlugin {
    * @param options drop-in UI options.
    */
   presentDropInPaymentUI(options?: PaymentUIOptions): Promise<PaymentUIResult>;
+
+  // TODO Add unique method for web, to collect the nonce after the user interacted with the drop in
+  // collectPaymentResults(): Promise<PaymentUIResult>
 }
