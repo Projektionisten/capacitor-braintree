@@ -9,5 +9,5 @@ end
 
 target 'Plugin' do
   capacitor_pods
-  pod 'BraintreeDropIn'
+  pod 'Braintree'
 end

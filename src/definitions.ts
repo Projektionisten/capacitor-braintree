@@ -29,7 +29,7 @@ export interface TokenOptions {
 }
 
 /**
-* Options for the presentDropInPaymentUI method.
+* Options for the payment methods.
 */
 export interface PaymentUIOptions {
 
@@ -58,7 +58,7 @@ export interface PaymentUIOptions {
 }
 
 /**
-* Successful callback result for the presentDropInPaymentUI method.
+* Successful callback result for the payment methods.
 */
 export interface PaymentUIResult {
 
@@ -151,30 +151,52 @@ export interface PaymentUIResult {
   };
 }
 
-export interface BraintreePlugin {
+/**
+ * Result for a method that checks if a given payment method is ready to be used
+ */
+export interface PaymentMethodReadyResult {
+  // Readyness result of the payment method
+  ready: boolean;
+}
+
+export interface BraintreeSDKPlugin {
   /**
-   * --- Android Only ---
-   * This updates the DropInClient in the plugin with a new auth token.
+   * This updates the plugin with a new auth token.
    *
-   * This needs to be called before the DropInUi can be used.
+   * This needs to be called before the SDK can be used.
    *
    * @param token The client token or tokenization key to use with the Braintree client.
    */
   setClientToken(options: TokenOptions): Promise<void>;
 
   /**
-   * Used to configure Apple Pay on iOS
+   * Starts a transaction with the paypal sdk. Will open a seperate browser window or similar to complete and
+   * return with information about the used account and the payment nonce
    *
-   * @param options Apple Pay options.
+   * @param options
    */
-  setupApplePay(options?: ApplePayOptions): Promise<void>;
+  startPaypalVaultPayment(options: PaymentUIOptions): Promise<PaymentUIResult>;
 
   /**
-   * Shows Braintree's drop-in payment UI.
+   * Starts a transaction with the apple pay sdk. Will open a seperate browser window or similar to complete and
+   * return with information about the used account and the payment nonce
    *
-   * @param options drop-in UI options.
+   * @param options
    */
-  presentDropInPaymentUI(options?: PaymentUIOptions): Promise<PaymentUIResult>;
+  startApplePayPayment(options: PaymentUIOptions): Promise<PaymentUIResult>;
+
+  /**
+   * Starts a transaction with the google pay sdk. Will open a seperate browser window or similar to complete and
+   * return with information about the used account and the payment nonce
+   *
+   * @param options
+   */
+  startGooglePayPayment(options: PaymentUIOptions): Promise<PaymentUIResult>;
+
+  /**
+   * Google pay specifically offers a method to wait for it to be ready to use. Returns a promise that resolves when it is ready.
+   */
+  isGooglePayReady(): Promise<PaymentMethodReadyResult>;
 
   // TODO Add unique method for web, to collect the nonce after the user interacted with the drop in
   // collectPaymentResults(): Promise<PaymentUIResult>

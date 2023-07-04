@@ -46,21 +46,17 @@ android {
 repositories {
     google()
     mavenCentral()
-    maven {
-        url "https://cardinalcommerceprod.jfrog.io/artifactory/android"
-        credentials {
-            username 'braintree_team_sdk'
-            password 'AKCp8jQcoDy2hxSWhDAUQKXLDPDx6NYRkqrgFLRc3qDrayg6rrCbJpsKKyMwaykVL8FWusJpp'
-        }
-    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':capacitor-android')
 
-    api 'com.braintreepayments.api:drop-in:6.9.0'
-    implementation 'com.google.android.gms:play-services-wallet:19.2.0-beta01+'
+    // to offer paypal
+    implementation 'com.braintreepayments.api:paypal:4.31.0'
+
+    // to offer Google Pay
+    implementation 'com.braintreepayments.api:google-pay:4.31.0'
 
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.core:core:$androidxCoreVersion"

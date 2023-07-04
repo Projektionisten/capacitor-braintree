@@ -1,5 +1,5 @@
 {
-  "name": "@projektionisten/capacitor-braintree",
+  "name": "@projektionisten/capacitor-braintree-sdk",
   "version": "0.0.1",
   "description": "The Braintree API provides methods for sharing content in any sharing-enabled apps the user may have installed.",
   "main": "dist/plugin.cjs.js",
@@ -37,12 +37,12 @@
     "eslint": "eslint . --ext ts",
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
     "swiftlint": "node-swiftlint",
-    "docgen": "docgen --api BraintreePlugin --output-readme README.md --output-json dist/docs.json",
+    "docgen": "docgen --api BraintreeSDKPlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "publish:cocoapod": "pod trunk push ./CapacitorBraintree.podspec --allow-warnings"
+    "publish:cocoapod": "pod trunk push ./ProjektionistenCapacitorBraintreeSdk.podspec --allow-warnings"
   },
   "devDependencies": {
     "@capacitor/android": "^5.0.0",
@@ -52,6 +52,7 @@
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "~1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
+    "@types/braintree-web": "^3.75.23",
     "eslint": "^7.11.0",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",
@@ -81,7 +82,6 @@
   },
   "packageManager": "yarn@3.5.1",
   "dependencies": {
-    "@types/braintree-web-drop-in": "^1.34.2",
-    "braintree-web-drop-in": "^1.37.0"
+    "braintree-web": "^3.94.0"
   }
 }

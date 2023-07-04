@@ -10,23 +10,18 @@ npx cap sync
 ```
 ## Android
 
-The Braintree SDK depends on the Cardinal SDK, which can only be installed via a custom repository. This repo must be declared in your *project* level `build.gradle`
+For the paypal browser flow to work, you need to add this overload to the MainActivity of your android project
 
+```java
+@Override
+protected void onNewIntent(Intent newIntent) {
+    super.onNewIntent(newIntent);
 
-```gradle
-allprojects {
-    repositories {
-        ...
-        maven {
-            url "https://cardinalcommerceprod.jfrog.io/artifactory/android"
-            credentials {
-                username 'braintree_team_sdk'
-                password 'AKCp8jQcoDy2hxSWhDAUQKXLDPDx6NYRkqrgFLRc3qDrayg6rrCbJpsKKyMwaykVL8FWusJpp'
-            }
-        }
-    }
+    setIntent(newIntent);
 }
 ```
+
+
 
 If you want to enable GooglePay, you also need to add this meta tag to the application element in your Manifest file
 
@@ -39,8 +34,10 @@ If you want to enable GooglePay, you also need to add this meta tag to the appli
 <docgen-index>
 
 * [`setClientToken(...)`](#setclienttoken)
-* [`setupApplePay(...)`](#setupapplepay)
-* [`presentDropInPaymentUI(...)`](#presentdropinpaymentui)
+* [`startPaypalVaultPayment(...)`](#startpaypalvaultpayment)
+* [`startApplePayPayment(...)`](#startapplepaypayment)
+* [`startGooglePayPayment(...)`](#startgooglepaypayment)
+* [`isGooglePayReady()`](#isgooglepayready)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -54,10 +51,9 @@ If you want to enable GooglePay, you also need to add this meta tag to the appli
 setClientToken(options: TokenOptions) => Promise<void>
 ```
 
---- Android Only ---
-This updates the DropInClient in the plugin with a new auth token.
+This updates the plugin with a new auth token.
 
-This needs to be called before the DropInUi can be used.
+This needs to be called before the SDK can be used.
 
 | Param         | Type                                                  |
 | ------------- | ----------------------------------------------------- |
@@ -66,34 +62,69 @@ This needs to be called before the DropInUi can be used.
 --------------------
 
 
-### setupApplePay(...)
+### startPaypalVaultPayment(...)
 
 ```typescript
-setupApplePay(options?: ApplePayOptions | undefined) => Promise<void>
+startPaypalVaultPayment(options: PaymentUIOptions) => Promise<PaymentUIResult>
 ```
 
-Used to configure Apple Pay on iOS
+Starts a transaction with the paypal sdk. Will open a seperate browser window or similar to complete and
+return with information about the used account and the payment nonce
 
-| Param         | Type                                                        | Description        |
-| ------------- | ----------------------------------------------------------- | ------------------ |
-| **`options`** | <code><a href="#applepayoptions">ApplePayOptions</a></code> | Apple Pay options. |
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#paymentuioptions">PaymentUIOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#paymentuiresult">PaymentUIResult</a>&gt;</code>
 
 --------------------
 
 
-### presentDropInPaymentUI(...)
+### startApplePayPayment(...)
 
 ```typescript
-presentDropInPaymentUI(options?: PaymentUIOptions | undefined) => Promise<PaymentUIResult>
+startApplePayPayment(options: PaymentUIOptions) => Promise<PaymentUIResult>
 ```
 
-Shows Braintree's drop-in payment UI.
+Starts a transaction with the apple pay sdk. Will open a seperate browser window or similar to complete and
+return with information about the used account and the payment nonce
 
-| Param         | Type                                                          | Description         |
-| ------------- | ------------------------------------------------------------- | ------------------- |
-| **`options`** | <code><a href="#paymentuioptions">PaymentUIOptions</a></code> | drop-in UI options. |
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#paymentuioptions">PaymentUIOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#paymentuiresult">PaymentUIResult</a>&gt;</code>
+
+--------------------
+
+
+### startGooglePayPayment(...)
+
+```typescript
+startGooglePayPayment(options: PaymentUIOptions) => Promise<PaymentUIResult>
+```
+
+Starts a transaction with the google pay sdk. Will open a seperate browser window or similar to complete and
+return with information about the used account and the payment nonce
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#paymentuioptions">PaymentUIOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#paymentuiresult">PaymentUIResult</a>&gt;</code>
+
+--------------------
+
+
+### isGooglePayReady()
+
+```typescript
+isGooglePayReady() => Promise<PaymentMethodReadyResult>
+```
+
+Google pay specifically offers a method to wait for it to be ready to use. Returns a promise that resolves when it is ready.
+
+**Returns:** <code>Promise&lt;<a href="#paymentmethodreadyresult">PaymentMethodReadyResult</a>&gt;</code>
 
 --------------------
 
@@ -110,20 +141,9 @@ Options for setting up payment tokens
 | **`token`** | <code>string</code> | The token to be used |
 
 
-#### ApplePayOptions
-
-Options for the setupApplePay method.
-
-| Prop               | Type                | Description                                   |
-| ------------------ | ------------------- | --------------------------------------------- |
-| **`merchantId`**   | <code>string</code> | Apple Merchant ID can be obtained from Apple. |
-| **`currencyCode`** | <code>string</code> | 3 letter currency code ISO 4217               |
-| **`countryCode`**  | <code>string</code> | 2 letter country code ISO 3166-1              |
-
-
 #### PaymentUIResult
 
-Successful callback result for the presentDropInPaymentUI method.
+Successful callback result for the payment methods.
 
 | Prop                       | Type                                                                                                                                                                                   | Description                                                                                      |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -140,7 +160,7 @@ Successful callback result for the presentDropInPaymentUI method.
 
 #### PaymentUIOptions
 
-Options for the presentDropInPaymentUI method.
+Options for the payment methods.
 
 | Prop                     | Type                | Description                                                                                                      |
 | ------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------- |
@@ -148,5 +168,14 @@ Options for the presentDropInPaymentUI method.
 | **`primaryDescription`** | <code>string</code> | The description of the transaction to show in the drop-in UI on the summary row.                                 |
 | **`email`**              | <code>string</code> | The account email of the user for GooglePay, 3d secure etc                                                       |
 | **`selector`**           | <code>string</code> | --- WEB ONLY --- HTML Selector of the element the dropin should insert itself into                               |
+
+
+#### PaymentMethodReadyResult
+
+Result for a method that checks if a given payment method is ready to be used
+
+| Prop        | Type                 |
+| ----------- | -------------------- |
+| **`ready`** | <code>boolean</code> |
 
 </docgen-api>

@@ -356,9 +356,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@projektionisten/capacitor-braintree@workspace:.":
+"@projektionisten/capacitor-braintree-sdk@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@projektionisten/capacitor-braintree@workspace:."
+  resolution: "@projektionisten/capacitor-braintree-sdk@workspace:."
   dependencies:
     "@capacitor/android": ^5.0.0
     "@capacitor/core": ^5.0.0
@@ -367,8 +367,8 @@ __metadata:
     "@ionic/eslint-config": ^0.3.0
     "@ionic/prettier-config": ~1.0.1
     "@ionic/swiftlint-config": ^1.1.2
-    "@types/braintree-web-drop-in": ^1.34.2
-    braintree-web-drop-in: ^1.37.0
+    "@types/braintree-web": ^3.75.23
+    braintree-web: ^3.94.0
     eslint: ^7.11.0
     prettier: ~2.3.0
     prettier-plugin-java: ~1.0.2
@@ -388,26 +388,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/applepayjs@npm:*":
-  version: 14.0.0
-  resolution: "@types/applepayjs@npm:14.0.0"
-  checksum: faf82b647b2614ef4b626fa7e07058a18ea8ab775b5ab504f46f19dc7f6d29b762d344564fc7a83b03eafc0cb3da9063052fba821716ca3659b74b1694fec78a
-  languageName: node
-  linkType: hard
-
-"@types/braintree-web-drop-in@npm:^1.34.2":
-  version: 1.34.2
-  resolution: "@types/braintree-web-drop-in@npm:1.34.2"
-  dependencies:
-    "@types/applepayjs": "*"
-    "@types/braintree-web": "*"
-    "@types/googlepay": "*"
-    "@types/paypal-checkout-components": "*"
-  checksum: af8e871fdfe8ebb9ece42ac7f84a11b2bcd92ba2bf057ebdd6021f3f95b219de985440f9acc8510b4ea4b390da1b44b543cf06dd937dd6e5889e93c532d8ee48
-  languageName: node
-  linkType: hard
-
-"@types/braintree-web@npm:*":
+"@types/braintree-web@npm:^3.75.23":
   version: 3.75.23
   resolution: "@types/braintree-web@npm:3.75.23"
   dependencies:
@@ -829,21 +810,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"braintree-web-drop-in@npm:^1.37.0":
-  version: 1.37.0
-  resolution: "braintree-web-drop-in@npm:1.37.0"
-  dependencies:
-    "@braintree/asset-loader": 0.4.4
-    "@braintree/browser-detection": 1.14.0
-    "@braintree/event-emitter": 0.4.1
-    "@braintree/uuid": 0.1.0
-    "@braintree/wrap-promise": 2.1.0
-    braintree-web: 3.94.0
-  checksum: c036ff69a1d9ff9d8faf036dcce97659287f994b8280b1a1eaf6eb1a5e9619fa1b6c485e2985d1920106790b553fbfaddad848a7f0e7909da383146fe921017d
-  languageName: node
-  linkType: hard
-
-"braintree-web@npm:3.94.0":
+"braintree-web@npm:^3.94.0":
   version: 3.94.0
   resolution: "braintree-web@npm:3.94.0"
   dependencies:
