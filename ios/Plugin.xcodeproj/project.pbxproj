@@ -8,20 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		03FC29A292ACC40490383A1F /* Pods_Plugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B2A61DA5A1F2DD4F959604D /* Pods_Plugin.framework */; };
-		50ADFF99201F53D600D50D53 /* BraintreePlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 50ADFF8B201F53D600D50D53 /* BraintreePlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		35D3B05B2A5542E600055A5D /* BraintreeSDKPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D3B0582A5542E600055A5D /* BraintreeSDKPlugin.m */; };
+		35D3B05C2A5542E600055A5D /* BraintreeSDKPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 35D3B0592A5542E600055A5D /* BraintreeSDKPlugin.h */; };
+		35D3B05D2A5542E600055A5D /* BraintreeSDKPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D3B05A2A5542E600055A5D /* BraintreeSDKPlugin.swift */; };
 		50ADFFA42020D75100D50D53 /* Capacitor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50ADFFA52020D75100D50D53 /* Capacitor.framework */; };
-		50ADFFA82020EE4F00D50D53 /* BraintreePlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 50ADFFA72020EE4F00D50D53 /* BraintreePlugin.m */; };
-		50E1A94820377CB70090CE1A /* BraintreePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1A94720377CB70090CE1A /* BraintreePlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		35D3B0582A5542E600055A5D /* BraintreeSDKPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BraintreeSDKPlugin.m; sourceTree = "<group>"; };
+		35D3B0592A5542E600055A5D /* BraintreeSDKPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BraintreeSDKPlugin.h; sourceTree = "<group>"; };
+		35D3B05A2A5542E600055A5D /* BraintreeSDKPlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraintreeSDKPlugin.swift; sourceTree = "<group>"; };
 		3B2A61DA5A1F2DD4F959604D /* Pods_Plugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Plugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50ADFF88201F53D600D50D53 /* Plugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		50ADFF8B201F53D600D50D53 /* BraintreePlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BraintreePlugin.h; sourceTree = "<group>"; };
 		50ADFF8C201F53D600D50D53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50ADFFA52020D75100D50D53 /* Capacitor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Capacitor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		50ADFFA72020EE4F00D50D53 /* BraintreePlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BraintreePlugin.m; sourceTree = "<group>"; };
-		50E1A94720377CB70090CE1A /* BraintreePlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraintreePlugin.swift; sourceTree = "<group>"; };
 		5E23F77F099397094342571A /* Pods-Plugin.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plugin.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Plugin/Pods-Plugin.debug.xcconfig"; sourceTree = "<group>"; };
 		91781294A431A2A7CC6EB714 /* Pods-Plugin.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plugin.release.xcconfig"; path = "Pods/Target Support Files/Pods-Plugin/Pods-Plugin.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,9 +60,9 @@
 		50ADFF8A201F53D600D50D53 /* Plugin */ = {
 			isa = PBXGroup;
 			children = (
-				50E1A94720377CB70090CE1A /* BraintreePlugin.swift */,
-				50ADFF8B201F53D600D50D53 /* BraintreePlugin.h */,
-				50ADFFA72020EE4F00D50D53 /* BraintreePlugin.m */,
+				35D3B0592A5542E600055A5D /* BraintreeSDKPlugin.h */,
+				35D3B0582A5542E600055A5D /* BraintreeSDKPlugin.m */,
+				35D3B05A2A5542E600055A5D /* BraintreeSDKPlugin.swift */,
 				50ADFF8C201F53D600D50D53 /* Info.plist */,
 			);
 			path = Plugin;
@@ -93,7 +93,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50ADFF99201F53D600D50D53 /* BraintreePlugin.h in Headers */,
+				35D3B05C2A5542E600055A5D /* BraintreeSDKPlugin.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -190,8 +190,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50E1A94820377CB70090CE1A /* BraintreePlugin.swift in Sources */,
-				50ADFFA82020EE4F00D50D53 /* BraintreePlugin.m in Sources */,
+				35D3B05D2A5542E600055A5D /* BraintreeSDKPlugin.swift in Sources */,
+				35D3B05B2A5542E600055A5D /* BraintreeSDKPlugin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

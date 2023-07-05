@@ -10,4 +10,5 @@ end
 target 'Plugin' do
   capacitor_pods
   pod 'Braintree'
+  pod 'Braintree/ApplePay'
 end

@@ -198,6 +198,11 @@ export interface BraintreeSDKPlugin {
    */
   isGooglePayReady(): Promise<PaymentMethodReadyResult>;
 
+  /**
+   * Check if apple pay is available on this device
+   */
+  isApplePayAvailable(): Promise<PaymentMethodReadyResult>;
+
   // TODO Add unique method for web, to collect the nonce after the user interacted with the drop in
   // collectPaymentResults(): Promise<PaymentUIResult>
 }

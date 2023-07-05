@@ -11,7 +11,6 @@ import type {
 } from './definitions';
 
 export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
-
   private clientToken?: string;
   private braintreeClient?: Client;
   private googlePayClient?: GooglePayment;
@@ -129,6 +128,10 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
 
   public async startApplePayPayment (options: PaymentUIOptions): Promise<PaymentUIResult> {
     console.log(options);
+    throw new Error('Method not implemented.');
+  }
+
+  public async isApplePayAvailable (): Promise<PaymentMethodReadyResult> {
     throw new Error('Method not implemented.');
   }
 

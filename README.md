@@ -38,6 +38,7 @@ If you want to enable GooglePay, you also need to add this meta tag to the appli
 * [`startApplePayPayment(...)`](#startapplepaypayment)
 * [`startGooglePayPayment(...)`](#startgooglepaypayment)
 * [`isGooglePayReady()`](#isgooglepayready)
+* [`isApplePayAvailable()`](#isapplepayavailable)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -123,6 +124,19 @@ isGooglePayReady() => Promise<PaymentMethodReadyResult>
 ```
 
 Google pay specifically offers a method to wait for it to be ready to use. Returns a promise that resolves when it is ready.
+
+**Returns:** <code>Promise&lt;<a href="#paymentmethodreadyresult">PaymentMethodReadyResult</a>&gt;</code>
+
+--------------------
+
+
+### isApplePayAvailable()
+
+```typescript
+isApplePayAvailable() => Promise<PaymentMethodReadyResult>
+```
+
+Check if apple pay is available on this device
 
 **Returns:** <code>Promise&lt;<a href="#paymentmethodreadyresult">PaymentMethodReadyResult</a>&gt;</code>
 
