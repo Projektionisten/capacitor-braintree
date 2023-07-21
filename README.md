@@ -34,12 +34,13 @@ If you want to enable GooglePay, you also need to add this meta tag to the appli
 <docgen-index>
 
 * [`setClientToken(...)`](#setclienttoken)
-* [`startPaypalVaultPayment(...)`](#startpaypalvaultpayment)
+* [`startPaypalPayment(...)`](#startpaypalpayment)
 * [`startApplePayPayment(...)`](#startapplepaypayment)
 * [`startGooglePayPayment(...)`](#startgooglepaypayment)
 * [`isGooglePayReady()`](#isgooglepayready)
-* [`isApplePayAvailable()`](#isapplepayavailable)
+* [`isApplePayReady()`](#isapplepayready)
 * [Interfaces](#interfaces)
+* [Enums](#enums)
 
 </docgen-index>
 
@@ -63,18 +64,18 @@ This needs to be called before the SDK can be used.
 --------------------
 
 
-### startPaypalVaultPayment(...)
+### startPaypalPayment(...)
 
 ```typescript
-startPaypalVaultPayment(options: PaymentUIOptions) => Promise<PaymentUIResult>
+startPaypalPayment(options: PaypalPaymentOptions) => Promise<PaymentUIResult>
 ```
 
 Starts a transaction with the paypal sdk. Will open a seperate browser window or similar to complete and
 return with information about the used account and the payment nonce
 
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#paymentuioptions">PaymentUIOptions</a></code> |
+| Param         | Type                                                                  |
+| ------------- | --------------------------------------------------------------------- |
+| **`options`** | <code><a href="#paypalpaymentoptions">PaypalPaymentOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#paymentuiresult">PaymentUIResult</a>&gt;</code>
 
@@ -84,15 +85,15 @@ return with information about the used account and the payment nonce
 ### startApplePayPayment(...)
 
 ```typescript
-startApplePayPayment(options: PaymentUIOptions) => Promise<PaymentUIResult>
+startApplePayPayment(options: ApplePaymentOptions) => Promise<PaymentUIResult>
 ```
 
 Starts a transaction with the apple pay sdk. Will open a seperate browser window or similar to complete and
 return with information about the used account and the payment nonce
 
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#paymentuioptions">PaymentUIOptions</a></code> |
+| Param         | Type                                                                |
+| ------------- | ------------------------------------------------------------------- |
+| **`options`** | <code><a href="#applepaymentoptions">ApplePaymentOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#paymentuiresult">PaymentUIResult</a>&gt;</code>
 
@@ -102,15 +103,15 @@ return with information about the used account and the payment nonce
 ### startGooglePayPayment(...)
 
 ```typescript
-startGooglePayPayment(options: PaymentUIOptions) => Promise<PaymentUIResult>
+startGooglePayPayment(options: GooglePaymentOptions) => Promise<PaymentUIResult>
 ```
 
 Starts a transaction with the google pay sdk. Will open a seperate browser window or similar to complete and
 return with information about the used account and the payment nonce
 
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#paymentuioptions">PaymentUIOptions</a></code> |
+| Param         | Type                                                                  |
+| ------------- | --------------------------------------------------------------------- |
+| **`options`** | <code><a href="#googlepaymentoptions">GooglePaymentOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#paymentuiresult">PaymentUIResult</a>&gt;</code>
 
@@ -130,10 +131,10 @@ Google pay specifically offers a method to wait for it to be ready to use. Retur
 --------------------
 
 
-### isApplePayAvailable()
+### isApplePayReady()
 
 ```typescript
-isApplePayAvailable() => Promise<PaymentMethodReadyResult>
+isApplePayReady() => Promise<PaymentMethodReadyResult>
 ```
 
 Check if apple pay is available on this device
@@ -150,9 +151,10 @@ Check if apple pay is available on this device
 
 Options for setting up payment tokens
 
-| Prop        | Type                | Description          |
-| ----------- | ------------------- | -------------------- |
-| **`token`** | <code>string</code> | The token to be used |
+| Prop        | Type                                       | Description                                                                                                                                                                                                             | Default                   |
+| ----------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| **`token`** | <code>string</code>                        | The token to be used                                                                                                                                                                                                    |                           |
+| **`env`**   | <code>'development' \| 'production'</code> | Environment for the payment providers. Currently only used by the google pay client in the *WEB* implementation. When env is 'development', the google pay client will use the TEST config, accessing only the sandbox. | <code>'production'</code> |
 
 
 #### PaymentUIResult
@@ -167,12 +169,22 @@ Successful callback result for the payment methods.
 | **`localizedDescription`** | <code>string</code>                                                                                                                                                                    | A description of the payment method (if a payment was completed).                                |
 | **`card`**                 | <code>{ lastTwo: string; network: string; }</code>                                                                                                                                     | Information about the credit card used to complete a payment (if a credit card was used).        |
 | **`payPalAccount`**        | <code>{ email: string; firstName?: string; lastName?: string; phone?: string; billingAddress?: string; shippingAddress?: string; clientMetadataId?: string; payerId?: string; }</code> | Information about the PayPal account used to complete a payment (if a PayPal account was used).  |
-| **`applePaycard`**         | <code>{}</code>                                                                                                                                                                        | Information about the Apple Pay card used to complete a payment (if Apple Pay was used).         |
 | **`threeDSecureCard`**     | <code>{ liabilityShifted: boolean; liabilityShiftPossible: boolean; }</code>                                                                                                           | Information about 3D Secure card used to complete a payment (if 3D Secure was used).             |
-| **`venmoAccount`**         | <code>{ username: string; }</code>                                                                                                                                                     | Information about Venmo account used to complete a payment (if a Venmo account was used).        |
 
 
-#### PaymentUIOptions
+#### PaypalPaymentOptions
+
+Options for the payment methods.
+
+| Prop                     | Type                                                                | Description                                                                                                      |
+| ------------------------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **`amount`**             | <code>string</code>                                                 | The amount of the transaction to show in the drop-in UI on the summary row as well as the call to action button. |
+| **`primaryDescription`** | <code>string</code>                                                 | The description of the transaction to show in the drop-in UI on the summary row.                                 |
+| **`paymentFlow`**        | <code><a href="#paypal_payment_flow">PAYPAL_PAYMENT_FLOW</a></code> | Type of payment flow. Either an one-time checkout or a vaulted payment, for easier transactions in the future    |
+| **`userAction`**         | <code><a href="#paypal_user_action">PAYPAL_USER_ACTION</a></code>   | Defines the type of call to action button the user clicks to return to the shop                                  |
+
+
+#### ApplePaymentOptions
 
 Options for the payment methods.
 
@@ -180,8 +192,15 @@ Options for the payment methods.
 | ------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | **`amount`**             | <code>string</code> | The amount of the transaction to show in the drop-in UI on the summary row as well as the call to action button. |
 | **`primaryDescription`** | <code>string</code> | The description of the transaction to show in the drop-in UI on the summary row.                                 |
-| **`email`**              | <code>string</code> | The account email of the user for GooglePay, 3d secure etc                                                       |
-| **`selector`**           | <code>string</code> | --- WEB ONLY --- HTML Selector of the element the dropin should insert itself into                               |
+
+
+#### GooglePaymentOptions
+
+Options for the payment methods.
+
+| Prop         | Type                | Description                                                                                                      |
+| ------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **`amount`** | <code>string</code> | The amount of the transaction to show in the drop-in UI on the summary row as well as the call to action button. |
 
 
 #### PaymentMethodReadyResult
@@ -191,5 +210,24 @@ Result for a method that checks if a given payment method is ready to be used
 | Prop        | Type                 |
 | ----------- | -------------------- |
 | **`ready`** | <code>boolean</code> |
+
+
+### Enums
+
+
+#### PAYPAL_PAYMENT_FLOW
+
+| Members        | Value                   |
+| -------------- | ----------------------- |
+| **`CHECKOUT`** | <code>'checkout'</code> |
+| **`VAULT`**    | <code>'vault'</code>    |
+
+
+#### PAYPAL_USER_ACTION
+
+| Members                    | Value                   |
+| -------------------------- | ----------------------- |
+| **`CONTINUE_TO_CHECKOUT`** | <code>'continue'</code> |
+| **`COMMIT`**               | <code>'commit'</code>   |
 
 </docgen-api>

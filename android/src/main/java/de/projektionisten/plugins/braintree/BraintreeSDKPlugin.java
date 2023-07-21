@@ -9,6 +9,7 @@ import com.braintreepayments.api.GooglePayClient;
 import com.braintreepayments.api.GooglePayListener;
 import com.braintreepayments.api.GooglePayRequest;
 import com.braintreepayments.api.PayPalAccountNonce;
+import com.braintreepayments.api.PayPalCheckoutRequest;
 import com.braintreepayments.api.PayPalClient;
 import com.braintreepayments.api.PayPalListener;
 import com.braintreepayments.api.PayPalVaultRequest;
@@ -54,6 +55,11 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         });
     }
 
+    /**
+     * Sets the client token from the braintree backend in the token provider instance.
+     * The Braintree Client automatically fetches the token from the provider when it needs it.
+     * @param call Plugin callback object from capacitor
+     */
     @PluginMethod
     public synchronized void setClientToken(PluginCall call) {
         // Obtain the token argument
@@ -68,19 +74,49 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         call.resolve();
     }
 
+    /**
+     * Initiates a payment via paypal vault and returns the result, when the user completes or aborts the flow
+     * @param call Plugin callback object from capacitor
+     */
     @PluginMethod
-    public synchronized void startPaypalVaultPayment(PluginCall call)
+    public synchronized void startPaypalPayment(PluginCall call)
             throws JSONException {
         try {
             String description = call.getString("primaryDescription");
-            this.tokenizePayPalAccountWithVaultMethod(description);
+            String flowType = call.getString("paymentFlow");
+            String price = call.getString("amount");
+
+            if (flowType == null || flowType.isEmpty()) {
+                flowType = "checkout";
+            }
+
+            if ((price == null || price.isEmpty()) && flowType.equals("checkout")) {
+                call.reject("A price is required for checkout flow");
+                return;
+            }
+
+            switch (flowType) {
+                case "vault":
+                    this.tokenizePayPalAccountWithVaultMethod(description);
+                    break;
+                case "checkout":
+                default:
+                    this.tokenizePayPalAccountWithCheckoutMethod(description, price);
+                    break;
+            }
+
         } catch (Exception e) {
-            Log.e(TAG, "startPaypalVaultPayment failed with error ===> " + e.getMessage());
-            call.reject(TAG + ": startPaypalVaultPayment failed with error ===> " + e.getMessage());
+            Log.e(TAG, "startPaypalPayment failed with error ===> " + e.getMessage());
+            call.reject(TAG + ": startPaypalPayment failed with error ===> " + e.getMessage());
         }
 
         _call = call;
     }
+
+    /**
+     * Initiates a payment via google pay and returns the result, when the user completes or aborts the flow
+     * @param call Plugin callback object from capacitor
+     */
     @PluginMethod
     public synchronized void startGooglePayPayment(PluginCall call)
             throws JSONException {
@@ -95,6 +131,9 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         _call = call;
     }
 
+    /**
+     * Checks if google pay is configured and ready to be used on this device.
+     */
     @PluginMethod
     public synchronized void isGooglePayReady(PluginCall call)
             throws JSONException {
@@ -193,6 +232,17 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
 
     private void tokenizePayPalAccountWithVaultMethod(String description) {
         PayPalVaultRequest request = new PayPalVaultRequest();
+
+        if (description != null) {
+            request.setBillingAgreementDescription(description);
+        }
+
+        payPalClient.tokenizePayPalAccount(this.getActivity(), request);
+    }
+
+    private void tokenizePayPalAccountWithCheckoutMethod(String description, String price) {
+        PayPalCheckoutRequest request = new PayPalCheckoutRequest(price);
+        request.setCurrencyCode("EUR");
 
         if (description != null) {
             request.setBillingAgreementDescription(description);

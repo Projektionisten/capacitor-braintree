@@ -5,7 +5,7 @@
 // each method the plugin supports using the CAP_PLUGIN_METHOD macro.
 CAP_PLUGIN(BraintreeSDK, "BraintreeSDK",
     CAP_PLUGIN_METHOD(setClientToken, CAPPluginReturnPromise);
-    CAP_PLUGIN_METHOD(startPaypalVaultPayment, CAPPluginReturnPromise);
-    CAP_PLUGIN_METHOD(isApplePayAvailable, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(startPaypalPayment, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(isApplePayReady, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(startApplePayPayment, CAPPluginReturnPromise);
 )

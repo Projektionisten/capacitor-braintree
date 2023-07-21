@@ -1,22 +1,3 @@
-/**
- * Options for the setupApplePay method.
- */
-export interface ApplePayOptions {
-  /**
-   * Apple Merchant ID can be obtained from Apple.
-   */
-  merchantId: string;
-
-  /**
-   * 3 letter currency code ISO 4217
-   */
-  currencyCode: string;
-
-  /**
-   * 2 letter country code ISO 3166-1
-   */
-  countryCode: string;
-}
 
 /**
  * Options for setting up payment tokens
@@ -26,12 +7,31 @@ export interface TokenOptions {
    * The token to be used
    */
   token: string;
+
+  /**
+   * Environment for the payment providers.
+   * Currently only used by the google pay client in the *WEB* implementation.
+   * When env is 'development', the google pay client will use the TEST config, accessing only the sandbox.
+   *
+   * @default 'production'
+   */
+  env?: 'development' | 'production';
+}
+
+export enum PAYPAL_PAYMENT_FLOW {
+  CHECKOUT = 'checkout',
+  VAULT = 'vault'
+}
+
+export enum PAYPAL_USER_ACTION {
+  CONTINUE_TO_CHECKOUT = 'continue',
+  COMMIT = 'commit'
 }
 
 /**
 * Options for the payment methods.
 */
-export interface PaymentUIOptions {
+export interface PaypalPaymentOptions {
 
   /**
    * The amount of the transaction to show in the drop-in UI on the
@@ -46,15 +46,47 @@ export interface PaymentUIOptions {
   primaryDescription?: string;
 
   /**
-   * The account email of the user for GooglePay, 3d secure etc
+   * Type of payment flow. Either an one-time checkout or a vaulted payment, for easier transactions in the future
    */
-  email?: string;
+  paymentFlow?: PAYPAL_PAYMENT_FLOW;
 
   /**
-   * --- WEB ONLY ---
-   * HTML Selector of the element the dropin should insert itself into
+   * Defines the type of call to action button the user clicks to return to the shop
    */
-  selector?: string;
+  userAction?: PAYPAL_USER_ACTION;
+
+}
+
+/**
+* Options for the payment methods.
+*/
+export interface GooglePaymentOptions {
+
+  /**
+   * The amount of the transaction to show in the drop-in UI on the
+   * summary row as well as the call to action button.
+   */
+  amount: string;
+
+}
+
+/**
+* Options for the payment methods.
+*/
+export interface ApplePaymentOptions {
+
+  /**
+   * The amount of the transaction to show in the drop-in UI on the
+   * summary row as well as the call to action button.
+   */
+  amount: string;
+
+  /**
+   * The description of the transaction to show in the drop-in UI on the
+   * summary row.
+   */
+  primaryDescription?: string;
+
 }
 
 /**
@@ -130,12 +162,6 @@ export interface PaymentUIResult {
   };
 
   /**
-   * Information about the Apple Pay card used to complete a payment (if Apple Pay was used).
-   */
-  applePaycard?: {
-  };
-
-  /**
    * Information about 3D Secure card used to complete a payment (if 3D Secure was used).
    */
   threeDSecureCard?: {
@@ -143,12 +169,6 @@ export interface PaymentUIResult {
       liabilityShiftPossible: boolean;
   };
 
-  /**
-   * Information about Venmo account used to complete a payment (if a Venmo account was used).
-   */
-  venmoAccount?: {
-      username: string;
-  };
 }
 
 /**
@@ -175,7 +195,7 @@ export interface BraintreeSDKPlugin {
    *
    * @param options
    */
-  startPaypalVaultPayment(options: PaymentUIOptions): Promise<PaymentUIResult>;
+  startPaypalPayment(options: PaypalPaymentOptions): Promise<PaymentUIResult>;
 
   /**
    * Starts a transaction with the apple pay sdk. Will open a seperate browser window or similar to complete and
@@ -183,7 +203,7 @@ export interface BraintreeSDKPlugin {
    *
    * @param options
    */
-  startApplePayPayment(options: PaymentUIOptions): Promise<PaymentUIResult>;
+  startApplePayPayment(options: ApplePaymentOptions): Promise<PaymentUIResult>;
 
   /**
    * Starts a transaction with the google pay sdk. Will open a seperate browser window or similar to complete and
@@ -191,7 +211,7 @@ export interface BraintreeSDKPlugin {
    *
    * @param options
    */
-  startGooglePayPayment(options: PaymentUIOptions): Promise<PaymentUIResult>;
+  startGooglePayPayment(options: GooglePaymentOptions): Promise<PaymentUIResult>;
 
   /**
    * Google pay specifically offers a method to wait for it to be ready to use. Returns a promise that resolves when it is ready.
@@ -201,8 +221,5 @@ export interface BraintreeSDKPlugin {
   /**
    * Check if apple pay is available on this device
    */
-  isApplePayAvailable(): Promise<PaymentMethodReadyResult>;
-
-  // TODO Add unique method for web, to collect the nonce after the user interacted with the drop in
-  // collectPaymentResults(): Promise<PaymentUIResult>
+  isApplePayReady(): Promise<PaymentMethodReadyResult>;
 }
