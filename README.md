@@ -21,6 +21,18 @@ protected void onNewIntent(Intent newIntent) {
 }
 ```
 
+Also, an intent-filter for the jump back into the app needs to be defined. The `${applicationId}` does not need to be replaced by anything, it automatically inserts the package name of the application
+
+``` xml
+<intent-filter >
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+
+    <data android:scheme="${applicationId}.braintree" />
+</intent-filter>
+```
+
 
 
 If you want to enable GooglePay, you also need to add this meta tag to the application element in your Manifest file

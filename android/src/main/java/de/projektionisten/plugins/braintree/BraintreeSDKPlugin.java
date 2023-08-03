@@ -1,9 +1,7 @@
 package de.projektionisten.plugins.braintree;
 
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.braintreepayments.api.BraintreeClient;
 import com.braintreepayments.api.GooglePayClient;
 import com.braintreepayments.api.GooglePayListener;
@@ -22,14 +20,13 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.google.android.gms.wallet.TransactionInfo;
 import com.google.android.gms.wallet.WalletConstants;
-
-import org.json.JSONException;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONException;
 
 @CapacitorPlugin(name = "BraintreeSDK")
 public class BraintreeSDKPlugin extends Plugin implements PayPalListener, GooglePayListener {
+
     private static final String TAG = "BraintreeSDKPlugin";
 
     private BraintreeClient braintreeClient;
@@ -45,14 +42,17 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         tokenProvider = new TokenProvider();
 
         // RUN ON UI THREAD
-        this.getActivity().runOnUiThread(() -> {
-            // BraintreeClient is instantiated with a token provider that returns the token from the app when it is available
-            braintreeClient = new BraintreeClient(this.getActivity(), tokenProvider);
-            payPalClient = new PayPalClient(this.getActivity(), braintreeClient);
-            payPalClient.setListener(this);
-            googlePayClient = new GooglePayClient(this.getActivity(), braintreeClient);
-            googlePayClient.setListener(this);
-        });
+        this.getActivity()
+            .runOnUiThread(
+                () -> {
+                    // BraintreeClient is instantiated with a token provider that returns the token from the app when it is available
+                    braintreeClient = new BraintreeClient(this.getActivity(), tokenProvider);
+                    payPalClient = new PayPalClient(this.getActivity(), braintreeClient);
+                    payPalClient.setListener(this);
+                    googlePayClient = new GooglePayClient(this.getActivity(), braintreeClient);
+                    googlePayClient.setListener(this);
+                }
+            );
     }
 
     /**
@@ -79,8 +79,7 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
      * @param call Plugin callback object from capacitor
      */
     @PluginMethod
-    public synchronized void startPaypalPayment(PluginCall call)
-            throws JSONException {
+    public synchronized void startPaypalPayment(PluginCall call) throws JSONException {
         try {
             String description = call.getString("primaryDescription");
             String flowType = call.getString("paymentFlow");
@@ -104,7 +103,6 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
                     this.tokenizePayPalAccountWithCheckoutMethod(description, price);
                     break;
             }
-
         } catch (Exception e) {
             Log.e(TAG, "startPaypalPayment failed with error ===> " + e.getMessage());
             call.reject(TAG + ": startPaypalPayment failed with error ===> " + e.getMessage());
@@ -118,8 +116,7 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
      * @param call Plugin callback object from capacitor
      */
     @PluginMethod
-    public synchronized void startGooglePayPayment(PluginCall call)
-            throws JSONException {
+    public synchronized void startGooglePayPayment(PluginCall call) throws JSONException {
         String price = call.getString("amount");
         try {
             this.initiateGooglePay(price);
@@ -135,19 +132,20 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
      * Checks if google pay is configured and ready to be used on this device.
      */
     @PluginMethod
-    public synchronized void isGooglePayReady(PluginCall call)
-            throws JSONException {
+    public synchronized void isGooglePayReady(PluginCall call) throws JSONException {
         try {
-            googlePayClient.isReadyToPay(this.getActivity(), (isReadyToPay, error) -> {
-                JSObject JSResult = new JSObject();
-                JSResult.put("ready", isReadyToPay);
-                call.resolve(JSResult);
-            });
+            googlePayClient.isReadyToPay(
+                this.getActivity(),
+                (isReadyToPay, error) -> {
+                    JSObject JSResult = new JSObject();
+                    JSResult.put("ready", isReadyToPay);
+                    call.resolve(JSResult);
+                }
+            );
         } catch (Exception e) {
             Log.e(TAG, "isGooglePayReady failed with error ===> " + e.getMessage());
             call.reject(TAG + ": isGooglePayReady failed with error ===> " + e.getMessage());
         }
-
     }
 
     @Override
@@ -155,7 +153,6 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         Log.i(TAG, "Paypal Vault Result: paymentMethodNonce = " + payPalAccountNonce);
         JSObject JSResult = this.getPaymentUINonceResult(payPalAccountNonce);
         _call.resolve(JSResult);
-
     }
 
     @Override
@@ -174,6 +171,7 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
             }
         }
     }
+
     @Override
     public void onGooglePaySuccess(@NonNull PaymentMethodNonce paymentMethodNonce) {
         Log.i(TAG, "GooglePay Result: paymentMethodNonce = " + paymentMethodNonce);
@@ -208,21 +206,19 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
      * @return The dictionary of data populated via the given payment method nonce.
      */
     private JSObject getPaymentUINonceResult(PaymentMethodNonce paymentMethodNonce) {
-
         JSObject resultMap = new JSObject();
         resultMap.put("userCancelled", false);
         resultMap.put("nonce", paymentMethodNonce.getString());
 
         // PayPal
-        if (paymentMethodNonce instanceof PayPalAccountNonce payPalAccountNonce) {
-
+        if (paymentMethodNonce instanceof PayPalAccountNonce) {
             Map<String, Object> innerMap = new HashMap<>();
-            resultMap.put("email", payPalAccountNonce.getEmail());
-            resultMap.put("firstName", payPalAccountNonce.getFirstName());
-            resultMap.put("lastName", payPalAccountNonce.getLastName());
-            resultMap.put("phone", payPalAccountNonce.getPhone());
-            resultMap.put("clientMetadataId", payPalAccountNonce.getClientMetadataId());
-            resultMap.put("payerId", payPalAccountNonce.getPayerId());
+            resultMap.put("email", ((PayPalAccountNonce) paymentMethodNonce).getEmail());
+            resultMap.put("firstName", ((PayPalAccountNonce) paymentMethodNonce).getFirstName());
+            resultMap.put("lastName", ((PayPalAccountNonce) paymentMethodNonce).getLastName());
+            resultMap.put("phone", ((PayPalAccountNonce) paymentMethodNonce).getPhone());
+            resultMap.put("clientMetadataId", ((PayPalAccountNonce) paymentMethodNonce).getClientMetadataId());
+            resultMap.put("payerId", ((PayPalAccountNonce) paymentMethodNonce).getPayerId());
 
             resultMap.put("paypalAccount", innerMap);
         }
@@ -243,7 +239,6 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
     private void tokenizePayPalAccountWithCheckoutMethod(String description, String price) {
         PayPalCheckoutRequest request = new PayPalCheckoutRequest(price);
         request.setCurrencyCode("EUR");
-
         if (description != null) {
             request.setBillingAgreementDescription(description);
         }
@@ -253,11 +248,14 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
 
     private void initiateGooglePay(String price) {
         GooglePayRequest googlePayRequest = new GooglePayRequest();
-        googlePayRequest.setTransactionInfo(TransactionInfo.newBuilder()
+        googlePayRequest.setTransactionInfo(
+            TransactionInfo
+                .newBuilder()
                 .setTotalPrice(price)
                 .setTotalPriceStatus(WalletConstants.TOTAL_PRICE_STATUS_FINAL)
                 .setCurrencyCode("EUR")
-                .build());
+                .build()
+        );
         googlePayClient.requestPayment(this.getActivity(), googlePayRequest);
     }
 }

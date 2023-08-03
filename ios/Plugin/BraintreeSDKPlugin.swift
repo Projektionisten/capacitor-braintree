@@ -6,13 +6,12 @@ import Capacitor
 public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate {
 
     private var braintreeClient: BTAPIClient!
-    private var currentPluginCall: CAPPluginCall!;
+    private var currentPluginCall: CAPPluginCall!
 
-
-     @objc func setClientToken(_ call: CAPPluginCall) {
+    @objc func setClientToken(_ call: CAPPluginCall) {
         if let token: String = call.getString("token") {
 
-            self.braintreeClient = BTAPIClient(authorization: token);
+            self.braintreeClient = BTAPIClient(authorization: token)
             call.resolve()
 
         } else {
@@ -21,35 +20,56 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
         }
     }
 
-     @objc func startPaypalPayment(_ call: CAPPluginCall) {
+    @objc func startPaypalPayment(_ call: CAPPluginCall) {
 
-         if self.braintreeClient != nil {
-             let payPalDriver = BTPayPalDriver(apiClient: self.braintreeClient);
+        if self.braintreeClient != nil {
+            let payPalDriver = BTPayPalDriver(apiClient: self.braintreeClient)
 
-             // Start the Vault flow
-             let vaultRequest = BTPayPalVaultRequest();
-             vaultRequest.billingAgreementDescription = call.getString("primaryDescription");
+            var flowType: String = "checkout"
+            if let flowOption: String = call.getString("paymentFlow") {
+                flowType = flowOption
+            }
 
-             payPalDriver.tokenizePayPalAccount(with: vaultRequest) { (tokenizedPayPalAccount, error) in
-                 if let tokenizedPayPalAccount = tokenizedPayPalAccount {
-                     print("Got a nonce: (tokenizedPayPalAccount.nonce)")
-                     // Send payment method nonce to your server to create a transaction
-                     call.resolve([
+            let paypalRequest: BTPayPalRequest
+            switch flowType {
+            case "vault":
+                paypalRequest = BTPayPalVaultRequest()
+                paypalRequest.billingAgreementDescription = call.getString("primaryDescription")
+                break
+            case "checkout":
+                fallthrough
+            default:
+                if let price: String = call.getString("amount") {
+                    paypalRequest = BTPayPalCheckoutRequest(amount: price)
+                    paypalRequest.billingAgreementDescription = call.getString("primaryDescription")
+                } else {
+                    call.reject("Transaction amount must be set for checkout process")
+                    return
+                }
+                break
+            }
+
+            payPalDriver.tokenizePayPalAccount(with: paypalRequest) { (tokenizedPayPalAccount, error) in
+                if let tokenizedPayPalAccount = tokenizedPayPalAccount {
+                    print("Got a nonce: (tokenizedPayPalAccount.nonce)")
+                    // Send payment method nonce to your server to create a transaction
+                    call.resolve([
                         "nonce": tokenizedPayPalAccount.nonce,
                         "userCancelled": false
-                     ])
-                 } else if let error = error {
-                     call.reject("Error in paypal payment: " + error.localizedDescription)
-                 } else {
-                     // Buyer canceled payment approval
-                     call.resolve([
+                    ])
+                } else if let error = error {
+                    call.reject("Error in paypal payment: " + error.localizedDescription)
+                } else {
+                    // Buyer canceled payment approval
+                    call.resolve([
                         "userCancelled": true
-                     ])
-                 }
-             }
-         } else {
-             call.reject("No client token was provided or the client was not initialized. Call 'setClientToken' first")
-         }
+                    ])
+                }
+            }
+
+        } else {
+            call.reject("No client token was provided or the client was not initialized. Call 'setClientToken' first")
+        }
 
     }
 
@@ -57,18 +77,18 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
         if PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: [PKPaymentNetwork.visa, PKPaymentNetwork.masterCard, PKPaymentNetwork.maestro]) {
             call.resolve([
                 "ready": true
-            ]);
+            ])
 
         } else {
             call.resolve([
                 "ready": false
-            ]);
+            ])
         }
     }
 
     @objc func startApplePayPayment(_ call: CAPPluginCall) {
         if self.braintreeClient != nil {
-            self.currentPluginCall = call;
+            self.currentPluginCall = call
 
             self.setupApplePayPaymentRequest { (paymentRequest, error) in
                 guard error == nil else {
@@ -84,8 +104,7 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
                 // Promote PKPaymentAuthorizationViewController to optional so that we can verify
                 // that our paymentRequest is valid. Otherwise, an invalid paymentRequest would crash our app.
                 if let vc = PKPaymentAuthorizationViewController(paymentRequest: paymentRequest!)
-                    as PKPaymentAuthorizationViewController?
-                {
+                    as PKPaymentAuthorizationViewController? {
                     vc.delegate = self
                     self.bridge?.viewController?.present(vc, animated: true, completion: nil)
                 } else {
@@ -117,14 +136,13 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
         }
     }
 
-
     /**
      One of the events of PKPaymentAuthorizationViewControllerDelegate. When the user has finished the payment authorization in the apple pay overlay,
      this gets called and we tokenize the payment to get the nonce for the frontend
      */
     public func paymentAuthorizationViewController(_ controller: PKPaymentAuthorizationViewController,
-                             didAuthorizePayment payment: PKPayment,
-                                      handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
+                                                   didAuthorizePayment payment: PKPayment,
+                                                   handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
 
         let applePayClient = BTApplePayClient(apiClient: self.braintreeClient)
         // Tokenize the Apple Pay payment
@@ -164,6 +182,10 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
      */
     public func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
         controller.dismiss(animated: true)
+    }
+
+    func constructPaypalRequest (_ call: CAPPluginCall) {
+
     }
 
 }

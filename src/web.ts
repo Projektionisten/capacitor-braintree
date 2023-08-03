@@ -1,5 +1,10 @@
 import { WebPlugin } from '@capacitor/core';
-import type { Client, GooglePayment, PayPal, PayPalTokenizePayload } from 'braintree-web';
+import type {
+  Client,
+  GooglePayment,
+  PayPal,
+  PayPalTokenizePayload,
+} from 'braintree-web';
 import { client, googlePayment, paypal } from 'braintree-web';
 
 import type {
@@ -8,11 +13,9 @@ import type {
   PaymentMethodReadyResult,
   PaymentUIResult,
   PaypalPaymentOptions,
-  TokenOptions
+  TokenOptions,
 } from './definitions';
-import {
-  PAYPAL_PAYMENT_FLOW, PAYPAL_USER_ACTION
-} from './definitions';
+import { PAYPAL_PAYMENT_FLOW, PAYPAL_USER_ACTION } from './definitions';
 
 export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
   private braintreeClient?: Client;
@@ -24,11 +27,11 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
    *
    * @param options Param object containing the client token for the braintree sdk
    */
-  public async setClientToken (options: TokenOptions): Promise<void> {
+  public async setClientToken(options: TokenOptions): Promise<void> {
     if (options.token !== '') {
       // initialize general braintree client
       this.braintreeClient = await client.create({
-        authorization: options.token
+        authorization: options.token,
       });
 
       try {
@@ -40,7 +43,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
         });
 
         this.googlePaymentsInstance = new google.payments.api.PaymentsClient({
-          environment: options.env === 'development' ? 'TEST' : 'PRODUCTION'
+          environment: options.env === 'development' ? 'TEST' : 'PRODUCTION',
         });
       } catch (error) {
         console.debug('Creation of google client failed', error);
@@ -57,8 +60,12 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
    *
    * @returns Object containing a boolean of the status of google pay
    */
-  public async isGooglePayReady (): Promise<PaymentMethodReadyResult> {
-    if (this.braintreeClient === undefined || this.googlePaymentsInstance === undefined || this.googlePayClient === undefined) {
+  public async isGooglePayReady(): Promise<PaymentMethodReadyResult> {
+    if (
+      this.braintreeClient === undefined ||
+      this.googlePaymentsInstance === undefined ||
+      this.googlePayClient === undefined
+    ) {
       throw 'Use `setClientToken` first to initialize client';
     }
 
@@ -66,12 +73,14 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
       const readyToPay = await this.googlePaymentsInstance.isReadyToPay({
         apiVersion: 2,
         apiVersionMinor: 0,
-        allowedPaymentMethods: (await this.googlePayClient.createPaymentDataRequest()).allowedPaymentMethods,
-        existingPaymentMethodRequired: true
+        allowedPaymentMethods: (
+          await this.googlePayClient.createPaymentDataRequest()
+        ).allowedPaymentMethods,
+        existingPaymentMethodRequired: true,
       });
       return Promise.resolve({
-        ready: readyToPay.result
-      })
+        ready: readyToPay.result,
+      });
     } catch (error: any) {
       throw new Error(error);
     }
@@ -82,37 +91,45 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
    *
    * @returns Resulting information from the payment. Most importantly, the nonce of the authorized payment
    */
-  public async startGooglePayPayment (options: GooglePaymentOptions): Promise<PaymentUIResult> {
+  public async startGooglePayPayment(
+    options: GooglePaymentOptions,
+  ): Promise<PaymentUIResult> {
     if (options.amount == undefined) {
       throw 'Price is required';
     }
 
-    if (this.braintreeClient == undefined || this.googlePaymentsInstance === undefined || this.googlePayClient === undefined) {
+    if (
+      this.braintreeClient == undefined ||
+      this.googlePaymentsInstance === undefined ||
+      this.googlePayClient === undefined
+    ) {
       throw 'Use `setClientToken` first';
     }
 
     try {
+      const paymentRequest =
+        await this.googlePayClient.createPaymentDataRequest({
+          transactionInfo: {
+            currencyCode: 'EUR',
+            totalPriceStatus: 'FINAL',
+            totalPrice: options.amount,
+          },
+        });
 
-      const paymentRequest = await this.googlePayClient.createPaymentDataRequest({
-        transactionInfo: {
-          currencyCode: 'EUR',
-          totalPriceStatus: 'FINAL',
-          totalPrice: options.amount
-        }
-      })
-
-      const paymentData = await this.googlePaymentsInstance.loadPaymentData(paymentRequest)
-      const paymentResult = await this.googlePayClient.parseResponse(paymentData);
+      const paymentData = await this.googlePaymentsInstance.loadPaymentData(
+        paymentRequest,
+      );
+      const paymentResult = await this.googlePayClient.parseResponse(
+        paymentData,
+      );
 
       return Promise.resolve({
         userCancelled: false,
-        nonce: paymentResult.nonce
+        nonce: paymentResult.nonce,
       });
-
     } catch (error) {
       throw 'Error in google pay checkout: ' + error;
     }
-
   }
 
   /**
@@ -120,7 +137,9 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
    *
    * @returns Resulting information from the payment. Most importantly, the nonce of the authorized payment
    */
-  public async startPaypalPayment (options: PaypalPaymentOptions): Promise<PaymentUIResult> {
+  public async startPaypalPayment(
+    options: PaypalPaymentOptions,
+  ): Promise<PaymentUIResult> {
     if (options.amount === undefined) {
       throw 'Price is required';
     }
@@ -133,36 +152,42 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
 
     try {
       paypalClient = await paypal.create({
-        client: this.braintreeClient
+        client: this.braintreeClient,
       });
 
-      const paypalTokenizeResult: PayPalTokenizePayload = await paypalClient.tokenize({
-        flow: options.paymentFlow === PAYPAL_PAYMENT_FLOW.VAULT ? 'vault' : 'checkout',
-        locale: 'de_DE',
-        amount: options.amount,
-        currency: 'EUR',
-        useraction: options.userAction === PAYPAL_USER_ACTION.COMMIT ? 'commit': undefined,
-        billingAgreementDescription: options.primaryDescription ?? ''
-      })
+      const paypalTokenizeResult: PayPalTokenizePayload =
+        await paypalClient.tokenize({
+          flow:
+            options.paymentFlow === PAYPAL_PAYMENT_FLOW.VAULT
+              ? 'vault'
+              : 'checkout',
+          locale: 'de_DE',
+          amount: options.amount,
+          currency: 'EUR',
+          useraction:
+            options.userAction === PAYPAL_USER_ACTION.COMMIT
+              ? 'commit'
+              : undefined,
+          billingAgreementDescription: options.primaryDescription ?? '',
+        });
 
       return Promise.resolve({
         userCancelled: false,
         nonce: paypalTokenizeResult.nonce,
         payPalAccount: {
-          email: paypalTokenizeResult.details?.email
-        }
+          email: paypalTokenizeResult.details?.email,
+        },
       });
     } catch (error) {
       throw 'Error in paypal checkout: ' + error;
     }
   }
 
-  public async startApplePayPayment (): Promise<PaymentUIResult> {
+  public async startApplePayPayment(): Promise<PaymentUIResult> {
     throw new Error('Method not implemented.');
   }
 
-  public async isApplePayReady (): Promise<PaymentMethodReadyResult> {
+  public async isApplePayReady(): Promise<PaymentMethodReadyResult> {
     throw new Error('Method not implemented.');
   }
-
 }
