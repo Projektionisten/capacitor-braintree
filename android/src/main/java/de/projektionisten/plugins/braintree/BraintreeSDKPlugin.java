@@ -70,7 +70,9 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
             return;
         }
 
+        // Supply the token via the token provider for later
         this.tokenProvider.setClientToken(token);
+        // return a success
         call.resolve();
     }
 
@@ -85,6 +87,7 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
             String flowType = call.getString("paymentFlow");
             String price = call.getString("amount");
 
+            // make checkout the default flow, if no flowType was provided
             if (flowType == null || flowType.isEmpty()) {
                 flowType = "checkout";
             }
@@ -108,6 +111,7 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
             call.reject(TAG + ": startPaypalPayment failed with error ===> " + e.getMessage());
         }
 
+        // Keep a reference to the callback object
         _call = call;
     }
 
@@ -150,8 +154,8 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
 
     @Override
     public void onPayPalSuccess(@NonNull PayPalAccountNonce payPalAccountNonce) {
-        Log.i(TAG, "Paypal Vault Result: paymentMethodNonce = " + payPalAccountNonce);
         JSObject JSResult = this.getPaymentUINonceResult(payPalAccountNonce);
+        // use saved reference of callback object to complete the call of the app
         _call.resolve(JSResult);
     }
 
@@ -163,6 +167,7 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
             JSObject JSResult = new JSObject();
             JSResult.put("userCancelled", true);
             if (_call != null) {
+                // use saved reference of callback object to complete the call of the app
                 _call.resolve(JSResult);
             }
         } else {
@@ -174,8 +179,8 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
 
     @Override
     public void onGooglePaySuccess(@NonNull PaymentMethodNonce paymentMethodNonce) {
-        Log.i(TAG, "GooglePay Result: paymentMethodNonce = " + paymentMethodNonce);
         JSObject JSResult = this.getPaymentUINonceResult(paymentMethodNonce);
+        // use saved reference of callback object to complete the call of the app
         _call.resolve(JSResult);
     }
 
@@ -187,6 +192,7 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
             JSObject JSResult = new JSObject();
             JSResult.put("userCancelled", true);
             if (_call != null) {
+                // use saved reference of callback object to complete the call of the app
                 _call.resolve(JSResult);
             }
         } else {
@@ -233,16 +239,21 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
             request.setBillingAgreementDescription(description);
         }
 
+        // starts the process of guiding the user through the vault flow
+        // and will end up calling either `onPayPalSuccess` or `onPayPalFailure`
         payPalClient.tokenizePayPalAccount(this.getActivity(), request);
     }
 
     private void tokenizePayPalAccountWithCheckoutMethod(String description, String price) {
         PayPalCheckoutRequest request = new PayPalCheckoutRequest(price);
         request.setCurrencyCode("EUR");
+
         if (description != null) {
             request.setBillingAgreementDescription(description);
         }
 
+        // starts the process of guiding the user through the checkout flow
+        // and will end up calling either `onPayPalSuccess` or `onPayPalFailure`
         payPalClient.tokenizePayPalAccount(this.getActivity(), request);
     }
 
