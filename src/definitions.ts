@@ -141,7 +141,7 @@ export interface PaymentUIResult {
   /**
    * Information about the PayPal account used to complete a payment (if a PayPal account was used).
    */
-  payPalAccount?: {
+  paypalAccount?: {
     email: string;
     firstName?: string;
     lastName?: string;

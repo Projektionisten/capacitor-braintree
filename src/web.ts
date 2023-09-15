@@ -5,7 +5,7 @@ import type {
   PayPal,
   PayPalTokenizePayload,
 } from 'braintree-web';
-import { client, googlePayment, paypal } from 'braintree-web';
+import { client, googlePayment, paypal, dataCollector } from 'braintree-web';
 
 import type {
   BraintreeSDKPlugin,
@@ -19,6 +19,7 @@ import { PAYPAL_PAYMENT_FLOW, PAYPAL_USER_ACTION } from './definitions';
 
 export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
   private braintreeClient?: Client;
+  private correlationId?: string;
   private googlePayClient?: GooglePayment;
   private googlePaymentsInstance?: google.payments.api.PaymentsClient;
 
@@ -33,6 +34,11 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
       this.braintreeClient = await client.create({
         authorization: options.token,
       });
+
+      const dataCollectorInstance = await dataCollector.create({client: this.braintreeClient, paypal: true});
+      const deviceData: any = await dataCollectorInstance.getDeviceData({raw: true}) as object;
+
+      this.correlationId = deviceData.correlationId;
 
       try {
         // because we could not check for google pay availability otherwise, we also
@@ -174,8 +180,9 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
       return Promise.resolve({
         userCancelled: false,
         nonce: paypalTokenizeResult.nonce,
-        payPalAccount: {
+        paypalAccount: {
           email: paypalTokenizeResult.details?.email,
+          clientMetadataId: this.correlationId
         },
       });
     } catch (error) {

@@ -219,12 +219,12 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         // PayPal
         if (paymentMethodNonce instanceof PayPalAccountNonce) {
             Map<String, Object> innerMap = new HashMap<>();
-            resultMap.put("email", ((PayPalAccountNonce) paymentMethodNonce).getEmail());
-            resultMap.put("firstName", ((PayPalAccountNonce) paymentMethodNonce).getFirstName());
-            resultMap.put("lastName", ((PayPalAccountNonce) paymentMethodNonce).getLastName());
-            resultMap.put("phone", ((PayPalAccountNonce) paymentMethodNonce).getPhone());
-            resultMap.put("clientMetadataId", ((PayPalAccountNonce) paymentMethodNonce).getClientMetadataId());
-            resultMap.put("payerId", ((PayPalAccountNonce) paymentMethodNonce).getPayerId());
+            innerMap.put("email", ((PayPalAccountNonce) paymentMethodNonce).getEmail());
+            innerMap.put("firstName", ((PayPalAccountNonce) paymentMethodNonce).getFirstName());
+            innerMap.put("lastName", ((PayPalAccountNonce) paymentMethodNonce).getLastName());
+            innerMap.put("phone", ((PayPalAccountNonce) paymentMethodNonce).getPhone());
+            innerMap.put("clientMetadataId", ((PayPalAccountNonce) paymentMethodNonce).getClientMetadataId());
+            innerMap.put("payerId", ((PayPalAccountNonce) paymentMethodNonce).getPayerId());
 
             resultMap.put("paypalAccount", innerMap);
         }
