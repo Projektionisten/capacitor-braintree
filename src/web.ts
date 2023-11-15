@@ -38,7 +38,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
       const dataCollectorInstance = await dataCollector.create({client: this.braintreeClient, paypal: true});
       const deviceData: any = await dataCollectorInstance.getDeviceData({raw: true}) as object;
 
-      this.correlationId = deviceData.correlationId;
+      this.correlationId = deviceData['correlation_id'];
 
       try {
         // because we could not check for google pay availability otherwise, we also
