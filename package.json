@@ -1,6 +1,6 @@
 {
   "name": "@projektionisten/capacitor-braintree-sdk",
-  "version": "0.0.1-test5",
+  "version": "0.0.2",
   "description": "The Braintree API provides methods for sharing content in any sharing-enabled apps the user may have installed.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

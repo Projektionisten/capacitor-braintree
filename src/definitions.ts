@@ -59,10 +59,25 @@ export interface PaypalPaymentOptions {
  */
 export interface GooglePaymentOptions {
   /**
+   * Merchant ID to use for this transaction if it differs from the one in your braintree account
+   */
+  merchantId?: string;
+  /**
    * The amount of the transaction to show in the drop-in UI on the
    * summary row as well as the call to action button.
    */
   amount: string;
+  /**
+   * Is the price already the final one to be paid,
+   * or will potential sales taxes or shipping prices be added later in the checkout
+   * @default 'FINAL'
+   */
+  amountStatus?: 'ESTIMATED' | 'FINAL';
+  /**
+   * ISO 4217 code of the currency used, like 'EUR' or 'USD'
+   * @default 'EUR'
+   */
+  currencyCode?: string;
 }
 
 /**

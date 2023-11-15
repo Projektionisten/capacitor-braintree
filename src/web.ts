@@ -36,7 +36,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
       });
 
       const dataCollectorInstance = await dataCollector.create({client: this.braintreeClient, paypal: true});
-      const deviceData: any = await dataCollectorInstance.getDeviceData({raw: true}) as object;
+      const deviceData: any = await dataCollectorInstance.getDeviceData({raw: true}) as Record<string, unknown>;
 
       this.correlationId = deviceData['correlation_id'];
 
@@ -101,7 +101,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
     options: GooglePaymentOptions,
   ): Promise<PaymentUIResult> {
     if (options.amount == undefined) {
-      throw 'Price is required';
+      throw 'Amount is required';
     }
 
     if (
@@ -115,9 +115,12 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
     try {
       const paymentRequest =
         await this.googlePayClient.createPaymentDataRequest({
+          merchantInfo: options.merchantId !== undefined
+           ? { merchantId: options.merchantId }
+           : undefined,
           transactionInfo: {
-            currencyCode: 'EUR',
-            totalPriceStatus: 'FINAL',
+            currencyCode: options.currencyCode ?? 'EUR',
+            totalPriceStatus: options.amountStatus ?? 'FINAL',
             totalPrice: options.amount,
           },
         });
