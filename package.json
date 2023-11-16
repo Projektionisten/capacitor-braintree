@@ -52,7 +52,7 @@
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "~1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
-    "@types/braintree-web": "^3.75.23",
+    "@types/braintree-web": "^3.96.9",
     "eslint": "^7.11.0",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",
@@ -80,8 +80,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "yarn@3.5.1",
+  "packageManager": "yarn@4.0.2",
   "dependencies": {
-    "braintree-web": "^3.94.0"
+    "braintree-web": "^3.97.3"
   }
 }
