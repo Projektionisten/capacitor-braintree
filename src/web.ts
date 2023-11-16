@@ -1,13 +1,17 @@
 import { WebPlugin } from '@capacitor/core';
 import type {
+  ApplePay,
+  ApplePayPayload,
+  ApplePayPaymentRequest,
   Client,
   GooglePayment,
   PayPal,
   PayPalTokenizePayload,
 } from 'braintree-web';
-import { client, googlePayment, paypal, dataCollector } from 'braintree-web';
+import { client, googlePayment, paypal, dataCollector, ApplePaySession, applePay } from 'braintree-web';
 
 import type {
+  ApplePaymentOptions,
   BraintreeSDKPlugin,
   GooglePaymentOptions,
   PaymentMethodReadyResult,
@@ -21,6 +25,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
   private braintreeClient?: Client;
   private correlationId?: string;
   private googlePayClient?: GooglePayment;
+  private applePayClient?: ApplePay;
   private googlePaymentsInstance?: google.payments.api.PaymentsClient;
 
   /**
@@ -35,8 +40,13 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
         authorization: options.token,
       });
 
-      const dataCollectorInstance = await dataCollector.create({client: this.braintreeClient, paypal: true});
-      const deviceData: any = await dataCollectorInstance.getDeviceData({raw: true}) as Record<string, unknown>;
+      const dataCollectorInstance = await dataCollector.create({
+        client: this.braintreeClient,
+        paypal: true,
+      });
+      const deviceData: any = (await dataCollectorInstance.getDeviceData({
+        raw: true,
+      })) as Record<string, unknown>;
 
       this.correlationId = deviceData['correlation_id'];
 
@@ -53,6 +63,16 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
         });
       } catch (error) {
         console.debug('Creation of google client failed', error);
+        return Promise.reject();
+      }
+
+      try {
+        // because we could not check for apple pay availability otherwise, we also
+        // already initialize the apple payment client
+        this.applePayClient = await applePay.create({client: this.braintreeClient});
+      } catch (error) {
+        console.debug('Creation of apple client failed', error);
+        return Promise.reject();
       }
 
       return Promise.resolve();
@@ -97,9 +117,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
    *
    * @returns Resulting information from the payment. Most importantly, the nonce of the authorized payment
    */
-  public async startGooglePayPayment(
-    options: GooglePaymentOptions,
-  ): Promise<PaymentUIResult> {
+  public async startGooglePayPayment(options: GooglePaymentOptions): Promise<PaymentUIResult> {
     if (options.amount == undefined) {
       throw 'Amount is required';
     }
@@ -115,9 +133,10 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
     try {
       const paymentRequest =
         await this.googlePayClient.createPaymentDataRequest({
-          merchantInfo: options.merchantId !== undefined
-           ? { merchantId: options.merchantId }
-           : undefined,
+          merchantInfo:
+            options.merchantId !== undefined
+              ? { merchantId: options.merchantId }
+              : undefined,
           transactionInfo: {
             currencyCode: options.currencyCode ?? 'EUR',
             totalPriceStatus: options.amountStatus ?? 'FINAL',
@@ -185,7 +204,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
         nonce: paypalTokenizeResult.nonce,
         paypalAccount: {
           email: paypalTokenizeResult.details?.email,
-          clientMetadataId: this.correlationId
+          clientMetadataId: this.correlationId,
         },
       });
     } catch (error) {
@@ -193,11 +212,79 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
     }
   }
 
-  public async startApplePayPayment(): Promise<PaymentUIResult> {
-    throw new Error('Method not implemented.');
+  public async startApplePayPayment(options: ApplePaymentOptions): Promise<PaymentUIResult> {
+    if (
+      this.braintreeClient == undefined ||
+      this.applePayClient === undefined
+    ) {
+      throw 'Use `setClientToken` first';
+    }
+
+    const paymentRequest: ApplePayPaymentRequest = this.applePayClient.createPaymentRequest({
+      currencyCode: options.currencyCode ?? 'EUR',
+      countryCode: options.countryCode,
+      total: {
+        amount: options.amount,
+        label: options.primaryDescription ?? ''
+      }
+    });
+    const session: ApplePaySession = new ApplePaySession(3, paymentRequest);
+
+    return new Promise((resolve, reject) => {
+      session.onvalidatemerchant = (event) => {
+        this.applePayClient?.performValidation({
+          validationURL: event.validationURL
+        }, (err, merchantSession) => {
+          if (err) {
+            throw 'Apple Pay failed to load'
+          }
+          session.completeMerchantValidation(merchantSession);
+        });
+      };
+
+      session.onpaymentauthorized = (event) => {
+        console.log('Your shipping address is:', event.payment.shippingContact);
+
+        this.applePayClient?.tokenize({
+          token: event.payment.token
+        }, (tokenizeErr, payload?: ApplePayPayload) => {
+          if (tokenizeErr) {
+            console.error('Error tokenizing Apple Pay:', tokenizeErr);
+            session.completePayment(ApplePaySession.STATUS_FAILURE);
+            reject();
+          }
+
+          if (payload === undefined) {
+            console.error('Apple Pay payload was empty');
+            reject();
+          }
+
+          // After you have transacted with the payload.nonce,
+          // call 'completePayment' to dismiss the Apple Pay sheet.
+          session.completePayment(ApplePaySession.STATUS_SUCCESS);
+
+          resolve({
+            userCancelled: false,
+            nonce: payload?.nonce ?? '',
+            type: payload?.type,
+            localizedDescription: payload?.description
+          });
+        });
+      };
+
+      session.begin();
+    })
   }
 
   public async isApplePayReady(): Promise<PaymentMethodReadyResult> {
-    throw new Error('Method not implemented.');
+    if ((window as any).ApplePaySession && ApplePaySession.supportsVersion(3) && ApplePaySession.canMakePayments()) {
+      return Promise.resolve({
+        ready: true
+      });
+    } else {
+      return Promise.resolve({
+        ready: false
+      });
+    }
   }
 }

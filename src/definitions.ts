@@ -45,11 +45,15 @@ export interface PaypalPaymentOptions {
 
   /**
    * Type of payment flow. Either an one-time checkout or a vaulted payment, for easier transactions in the future
+   * @default PAYPAL_PAYMENT_FLOW.CHECKOUT
    */
   paymentFlow?: PAYPAL_PAYMENT_FLOW;
 
   /**
-   * Defines the type of call to action button the user clicks to return to the shop
+   * Defines the type of call to action button the user clicks to return to the shop.
+   * By default, the call to action button will imply that there is a checkout with a final price after the user authorization.
+   * Use PAYPAL_USER_ACTION.COMMIT if it should be a final "pay now" button.
+   * @default PAYPAL_USER_ACTION.CONTINUE_TO_CHECKOUT
    */
   userAction?: PAYPAL_USER_ACTION;
 }
@@ -89,6 +93,18 @@ export interface ApplePaymentOptions {
    * summary row as well as the call to action button.
    */
   amount: string;
+
+  /**
+   * ISO 4217 code of the currency used, like 'EUR' or 'USD'
+   * @default 'EUR'
+   */
+  currencyCode?: string;
+
+  /**
+   * ISO 3166 code of the merchants country, like 'DE' or 'US'.
+   * Defaults to the settings in your braintree backend
+   */
+  countryCode?: string;
 
   /**
    * The description of the transaction to show in the drop-in UI on the
