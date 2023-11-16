@@ -115,7 +115,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
   /**
    * Initiates a payment via google pay and returns the result, when the user completes or aborts the flow.
    *
-   * @returns Resulting information from the payment. Most importantly, the nonce of the authorized payment
+   * @returns Resulting information from the payment. Most importantly, the nonce of the authorized payment.
    */
   public async startGooglePayPayment(options: GooglePaymentOptions): Promise<PaymentUIResult> {
     if (options.amount == undefined) {
@@ -163,7 +163,7 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
   /**
    * Initiates a payment via paypal vault and returns the result, when the user completes or aborts the flow.
    *
-   * @returns Resulting information from the payment. Most importantly, the nonce of the authorized payment
+   * @returns Resulting information from the payment. Most importantly, the nonce of the authorized payment.
    */
   public async startPaypalPayment(
     options: PaypalPaymentOptions,
@@ -212,6 +212,28 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
     }
   }
 
+  /**
+   * A method to check if apple pay is possible to use for this device.
+   *
+   * @returns A result object containing a boolean about the availability of apple pay on this device
+   */
+  public async isApplePayReady(): Promise<PaymentMethodReadyResult> {
+    if ((window as any).ApplePaySession && ApplePaySession.supportsVersion(3) && ApplePaySession.canMakePayments()) {
+      return Promise.resolve({
+        ready: true
+      });
+    } else {
+      return Promise.resolve({
+        ready: false
+      });
+    }
+  }
+
+  /**
+   * Create an apple payment request and start the process for the user.
+   *
+   * @returns Resulting information from the payment. Most importantly, the nonce of the authorized payment.
+   */
   public async startApplePayPayment(options: ApplePaymentOptions): Promise<PaymentUIResult> {
     if (
       this.braintreeClient == undefined ||
@@ -276,15 +298,4 @@ export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
     })
   }
 
-  public async isApplePayReady(): Promise<PaymentMethodReadyResult> {
-    if ((window as any).ApplePaySession && ApplePaySession.supportsVersion(3) && ApplePaySession.canMakePayments()) {
-      return Promise.resolve({
-        ready: true
-      });
-    } else {
-      return Promise.resolve({
-        ready: false
-      });
-    }
-  }
 }
