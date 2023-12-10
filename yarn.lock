@@ -418,8 +418,6 @@ __metadata:
     eslint-plugin-no-null: "npm:^1.0.2"
     eslint-plugin-prefer-arrow: "npm:^1.2.3"
     eslint-plugin-unused-imports: "npm:^2.0.0"
-    prettier: "npm:~2.3.0"
-    prettier-plugin-java: "npm:~1.0.2"
     rimraf: "npm:^3.0.0"
     rollup: "npm:^2.29.0"
     swiftlint: "npm:^1.0.1"
@@ -1160,15 +1158,6 @@ __metadata:
     ansi-styles: "npm:^4.1.0"
     supports-color: "npm:^7.1.0"
   checksum: cb3f3e594913d63b1814d7ca7c9bafbf895f75fbf93b92991980610dfd7b48500af4e3a5d4e3a8f337990a96b168d7eb84ee55efdce965e2ee8efc20f8c8f139
-  languageName: node
-  linkType: hard
-
-"chevrotain@npm:6.5.0":
-  version: 6.5.0
-  resolution: "chevrotain@npm:6.5.0"
-  dependencies:
-    regexp-to-ast: "npm:0.4.0"
-  checksum: e98f7cc12bea6732246a0a2c25028bc076d5ed7dda470403599c595e5eece5d60fe808a7cdb187b938ad3364c308c03f9eb603e2743871c861db497186776efb
   languageName: node
   linkType: hard
 
@@ -2644,16 +2633,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"java-parser@npm:1.0.2":
-  version: 1.0.2
-  resolution: "java-parser@npm:1.0.2"
-  dependencies:
-    chevrotain: "npm:6.5.0"
-    lodash: "npm:4.17.21"
-  checksum: 4b8aef548aa0b8487f4a064f3da50278eee4bcbbbc4bfd936da69fdaf4ba91f8ff5a3843f4f3400c415f3e62cf562823b3b74e110bc63aacce7f8d11b49063a6
-  languageName: node
-  linkType: hard
-
 "js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -2754,13 +2733,6 @@ __metadata:
   version: 4.6.2
   resolution: "lodash.merge@npm:4.6.2"
   checksum: d0ea2dd0097e6201be083865d50c3fb54fbfbdb247d9cc5950e086c991f448b7ab0cdab0d57eacccb43473d3f2acd21e134db39f22dac2d6c9ba6bf26978e3d6
-  languageName: node
-  linkType: hard
-
-"lodash@npm:4.17.21":
-  version: 4.17.21
-  resolution: "lodash@npm:4.17.21"
-  checksum: c08619c038846ea6ac754abd6dd29d2568aa705feb69339e836dfa8d8b09abbb2f859371e86863eda41848221f9af43714491467b5b0299122431e202bb0c532
   languageName: node
   linkType: hard
 
@@ -3208,35 +3180,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier-plugin-java@npm:~1.0.2":
-  version: 1.0.2
-  resolution: "prettier-plugin-java@npm:1.0.2"
-  dependencies:
-    java-parser: "npm:1.0.2"
-    lodash: "npm:4.17.21"
-    prettier: "npm:2.2.1"
-  checksum: ac592812d824b3388c77f99b205393924da31937de245aa52f279ed552c41a226168e9f4102456a56d631a404c7ce9c633ab65487f7fbab5f845ae992813cc1e
-  languageName: node
-  linkType: hard
-
-"prettier@npm:2.2.1":
-  version: 2.2.1
-  resolution: "prettier@npm:2.2.1"
-  bin:
-    prettier: bin-prettier.js
-  checksum: 7bad7ef9cf2da3059a83de0729d480879f5adbe9974419a16a953dee69b2c720ebf1df8d1a713306547a5af8c2b6168a79cd94bda15202de0121348123f7903f
-  languageName: node
-  linkType: hard
-
-"prettier@npm:~2.3.0":
-  version: 2.3.2
-  resolution: "prettier@npm:2.3.2"
-  bin:
-    prettier: bin-prettier.js
-  checksum: 1481c939f64e2ba02277d8bb680974b0c925d3674e1cd68702cd4920361703c53d2cd7f49bcec086fab0820af8013df481b3ffd9e3beac86cfdba2212a614ba9
-  languageName: node
-  linkType: hard
-
 "promise-inflight@npm:^1.0.1":
   version: 1.0.1
   resolution: "promise-inflight@npm:1.0.1"
@@ -3290,13 +3233,6 @@ __metadata:
     string_decoder: "npm:^1.1.1"
     util-deprecate: "npm:^1.0.1"
   checksum: d9e3e53193adcdb79d8f10f2a1f6989bd4389f5936c6f8b870e77570853561c362bee69feca2bbb7b32368ce96a85504aa4cedf7cf80f36e6a9de30d64244048
-  languageName: node
-  linkType: hard
-
-"regexp-to-ast@npm:0.4.0":
-  version: 0.4.0
-  resolution: "regexp-to-ast@npm:0.4.0"
-  checksum: 381f57fa4d056056a50d7bc1365ece93434e1eea87bd3d60144ef6fd85bc4875410757908000c06fbe99ef9554c930c9890e695292b8e49756dfc0762890e777
   languageName: node
   linkType: hard
 

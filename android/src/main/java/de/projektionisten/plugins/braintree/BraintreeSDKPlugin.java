@@ -93,7 +93,7 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
             }
 
             if ((price == null || price.isEmpty()) && flowType.equals("checkout")) {
-                call.reject("A price is required for checkout flow");
+                call.reject("Transaction amount must be set for checkout process");
                 return;
             }
 
@@ -152,6 +152,9 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         }
     }
 
+    /**
+     * Success handler for paypal payment. Sends result back to the app
+     */
     @Override
     public void onPayPalSuccess(@NonNull PayPalAccountNonce payPalAccountNonce) {
         JSObject JSResult = this.getPaymentUINonceResult(payPalAccountNonce);
@@ -159,6 +162,10 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         _call.resolve(JSResult);
     }
 
+    /**
+     * Failure handler for paypal payment. Sends result back to the app.
+     * Can be either an error, or the user just aborting the process
+     */
     @Override
     public void onPayPalFailure(@NonNull Exception error) {
         Log.e(TAG, "Caught error from BraintreeSDK: " + error.getMessage());
@@ -177,6 +184,9 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         }
     }
 
+    /**
+     * Success handler for google payment. Sends result back to the app
+     */
     @Override
     public void onGooglePaySuccess(@NonNull PaymentMethodNonce paymentMethodNonce) {
         JSObject JSResult = this.getPaymentUINonceResult(paymentMethodNonce);
@@ -184,6 +194,10 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         _call.resolve(JSResult);
     }
 
+    /**
+     * Failure handler for google payment. Sends result back to the app.
+     * Can be either an error, or the user just aborting the process
+     */
     @Override
     public void onGooglePayFailure(@NonNull Exception error) {
         Log.e(TAG, "Caught error from BraintreeSDK: " + error.getMessage());
@@ -232,6 +246,9 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         return resultMap;
     }
 
+    /**
+     * Constructs the paypal (vault) request and starts the UI for the user to authorize the payment
+     */
     private void tokenizePayPalAccountWithVaultMethod(String description) {
         PayPalVaultRequest request = new PayPalVaultRequest();
 
@@ -244,6 +261,9 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         payPalClient.tokenizePayPalAccount(this.getActivity(), request);
     }
 
+    /**
+     * Constructs the paypal (checkout) request and starts the UI for the user to authorize the payment
+     */
     private void tokenizePayPalAccountWithCheckoutMethod(String description, String price) {
         PayPalCheckoutRequest request = new PayPalCheckoutRequest(price);
         request.setCurrencyCode("EUR");
@@ -257,6 +277,9 @@ public class BraintreeSDKPlugin extends Plugin implements PayPalListener, Google
         payPalClient.tokenizePayPalAccount(this.getActivity(), request);
     }
 
+    /**
+     * Constructs the google pay request and starts the UI for the user to authorize the payment
+     */
     private void initiateGooglePay(String price) {
         GooglePayRequest googlePayRequest = new GooglePayRequest();
         googlePayRequest.setTransactionInfo(

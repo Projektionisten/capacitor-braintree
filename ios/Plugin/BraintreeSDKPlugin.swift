@@ -5,9 +5,14 @@ import Capacitor
 @objc(BraintreeSDK)
 public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate {
 
-    private var braintreeClient: BTAPIClient!
-    private var currentPluginCall: CAPPluginCall!
+    private var braintreeClient: BTAPIClient?
+    private var currentPluginCall: CAPPluginCall?
 
+    /**
+	 * This updates the plugin with a new auth token.
+	 *
+	 * This needs to be called before the SDK can be used.
+	 */
     @objc func setClientToken(_ call: CAPPluginCall) {
         if let token: String = call.getString("token") {
 
@@ -20,6 +25,10 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
         }
     }
 
+    /**
+	 * Starts a transaction with the paypal sdk. Will open a seperate browser window or similar to complete and
+	 * return with information about the used account and the payment nonce
+	 */
     @objc func startPaypalPayment(_ call: CAPPluginCall) {
 
         if self.braintreeClient != nil {
@@ -73,6 +82,9 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
 
     }
 
+    /**
+	 * Check if apple pay is available on this device
+	 */
     @objc func isApplePayReady(_ call: CAPPluginCall) {
         if PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: [PKPaymentNetwork.visa, PKPaymentNetwork.masterCard, PKPaymentNetwork.maestro]) {
             call.resolve([
@@ -86,6 +98,10 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
         }
     }
 
+    /**
+     * Starts a transaction with the apple pay sdk. Will open a seperate browser window or similar to complete and
+	 * return with information about the used account and the payment nonce
+     */
     @objc func startApplePayPayment(_ call: CAPPluginCall) {
         if self.braintreeClient != nil {
             self.currentPluginCall = call
@@ -103,10 +119,10 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
 
                 // Promote PKPaymentAuthorizationViewController to optional so that we can verify
                 // that our paymentRequest is valid. Otherwise, an invalid paymentRequest would crash our app.
-                if let vc = PKPaymentAuthorizationViewController(paymentRequest: paymentRequest!)
-                    as PKPaymentAuthorizationViewController? {
-                    vc.delegate = self
-                    self.bridge?.viewController?.present(vc, animated: true, completion: nil)
+                if let viewController = PKPaymentAuthorizationViewController(paymentRequest: paymentRequest!)
+                {
+                    viewController.delegate = self
+                    self.bridge?.viewController?.present(viewController, animated: true, completion: nil)
                 } else {
                     call.reject("Apple payment failed. No PaymentAuthorizationViewController could be created")
                 }
@@ -116,6 +132,9 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
         }
     }
 
+    /**
+     * Constructs a payment request to use for a new transaction
+     */
     func setupApplePayPaymentRequest(completion: @escaping (PKPaymentRequest?, Error?) -> Void) {
         if self.braintreeClient != nil {
             let applePayClient = BTApplePayClient(apiClient: self.braintreeClient)
@@ -137,8 +156,8 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
     }
 
     /**
-     One of the events of PKPaymentAuthorizationViewControllerDelegate. When the user has finished the payment authorization in the apple pay overlay,
-     this gets called and we tokenize the payment to get the nonce for the frontend
+     * One of the events of PKPaymentAuthorizationViewControllerDelegate. When the user has finished the payment authorization in the apple pay overlay,
+     * this gets called and we tokenize the payment to get the nonce for the frontend
      */
     public func paymentAuthorizationViewController(_ controller: PKPaymentAuthorizationViewController,
                                                    didAuthorizePayment payment: PKPayment,
@@ -147,14 +166,26 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
         let applePayClient = BTApplePayClient(apiClient: self.braintreeClient)
         // Tokenize the Apple Pay payment
         applePayClient.tokenizeApplePay(payment) { (token, error) in
-            if error != nil {
+            if let error = error {
                 // Received an error from Braintree.
-                self.currentPluginCall.reject("Error in apple payment tokenization:" + error!.localizedDescription)
+                self.currentPluginCall.reject("Error in apple payment tokenization:" + error.localizedDescription)
                 completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
                 return
             }
 
-            if token == nil {
+            if let token = token {
+                // If requested, address information is accessible in 'payment' and may
+                // also be sent to your server.
+
+                // Then indicate success or failure based on the server side result of Transaction.sale
+                // via the completion callback.
+                // e.g. If the Transaction.sale was successful
+                self.currentPluginCall.resolve([
+                    "nonce": token.nonce,
+                    "userCancelled": false
+                ])
+                completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
+            } else {
                 self.currentPluginCall.resolve([
                     "userCancelled": false
                 ])
@@ -162,30 +193,14 @@ public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelega
                 return
             }
 
-            // TODO: On success, send nonce to your server for processing.
-            // If requested, address information is accessible in 'payment' and may
-            // also be sent to your server.
-
-            // Then indicate success or failure based on the server side result of Transaction.sale
-            // via the completion callback.
-            // e.g. If the Transaction.sale was successful
-            self.currentPluginCall.resolve([
-                "nonce": token!.nonce,
-                "userCancelled": false
-            ])
-            completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
         }
     }
 
     /**
-     One of the needed events of PKPaymentAuthorizationViewControllerDelegate. Used to just close the payment overlay.
+     * One of the needed events of PKPaymentAuthorizationViewControllerDelegate. Used to just close the payment overlay.
      */
     public func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
         controller.dismiss(animated: true)
-    }
-
-    func constructPaypalRequest (_ call: CAPPluginCall) {
-
     }
 
 }
