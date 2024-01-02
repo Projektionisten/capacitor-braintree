@@ -245,15 +245,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ionic/prettier-config@npm:~1.0.1":
-  version: 1.0.1
-  resolution: "@ionic/prettier-config@npm:1.0.1"
-  peerDependencies:
-    prettier: ^2.0.0
-  checksum: e909092e721543f2ac04809b5a84ed784a2d8911f83e1d4e08eed3037d30dbf3be9c486fb4cff533c1b8069e3d06d3ad61b56be8cba8c35a0606644de99d2a33
-  languageName: node
-  linkType: hard
-
 "@ionic/swiftlint-config@npm:^1.1.2":
   version: 1.1.2
   resolution: "@ionic/swiftlint-config@npm:1.1.2"
@@ -397,16 +388,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@projektionisten/capacitor-braintree-sdk@workspace:.":
+"@projektionisten/capacitor-braintree@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@projektionisten/capacitor-braintree-sdk@workspace:."
+  resolution: "@projektionisten/capacitor-braintree@workspace:."
   dependencies:
     "@capacitor/android": "npm:^5.0.0"
     "@capacitor/core": "npm:^5.0.0"
     "@capacitor/docgen": "npm:0.2.0"
     "@capacitor/ios": "npm:^5.0.0"
     "@ionic/eslint-config": "npm:^0.3.0"
-    "@ionic/prettier-config": "npm:~1.0.1"
     "@ionic/swiftlint-config": "npm:^1.1.2"
     "@types/braintree-web": "npm:^3.96.9"
     "@typescript-eslint/eslint-plugin": "npm:5.48.2"
@@ -435,12 +425,12 @@ __metadata:
   linkType: hard
 
 "@types/braintree-web@npm:^3.96.9":
-  version: 3.96.9
-  resolution: "@types/braintree-web@npm:3.96.9"
+  version: 3.96.10
+  resolution: "@types/braintree-web@npm:3.96.10"
   dependencies:
     "@types/googlepay": "npm:*"
     "@types/paypal-checkout-components": "npm:*"
-  checksum: 5c94d367a5bd48238d417e174b19d4940a7eda41dc4625808c1572ecba189c259bcbef70d60e37d5b497fbb1b20999ca83a8d1cbac068bb01e8a6e018c066cd4
+  checksum: d29d449163f7bc9294913d485cfde189d8301a1c443710e3aa69c1c03f54641c512a608ca1f4af1708a06c92e815607a04dc2e6990461c3c686a6659bd158388
   languageName: node
   linkType: hard
 
@@ -1049,8 +1039,8 @@ __metadata:
   linkType: hard
 
 "braintree-web@npm:^3.97.3":
-  version: 3.97.3
-  resolution: "braintree-web@npm:3.97.3"
+  version: 3.98.0
+  resolution: "braintree-web@npm:3.98.0"
   dependencies:
     "@braintree/asset-loader": "npm:0.4.4"
     "@braintree/browser-detection": "npm:1.17.1"
@@ -1066,7 +1056,7 @@ __metadata:
     inject-stylesheet: "npm:5.0.0"
     promise-polyfill: "npm:8.2.3"
     restricted-input: "npm:3.0.5"
-  checksum: 8882f932574c1b809b08633e71acd4df1b15e308e4a5d4f3b47501a70deeaeae3dcc6489732b48a62d2ca88fdb076317c2669806bbe29791f710c0066aa8a49d
+  checksum: 1e2fa7e4ea6a3923b129d32e30c7dcd22da602cab9e22e528dcd72687f60cecaac44dde496b309f72678379c93b5598e7707e98721a6d02f60bd80e31c88e99b
   languageName: node
   linkType: hard
 

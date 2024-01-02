@@ -13,7 +13,7 @@ import { client, googlePayment, paypal, dataCollector, ApplePaySession, applePay
 
 import type {
 	ApplePaymentOptions,
-	BraintreeSDKPlugin,
+	BraintreePlugin,
 	GooglePaymentOptions,
 	PaymentMethodReadyResult,
 	PaymentUIResult,
@@ -25,7 +25,7 @@ import { PAYPAL_PAYMENT_FLOW, PAYPAL_USER_ACTION } from './definitions';
 /**
  *
  */
-export class BraintreeSDKWeb extends WebPlugin implements BraintreeSDKPlugin {
+export class BraintreeWeb extends WebPlugin implements BraintreePlugin {
 	private braintreeClient?: Client;
 	private correlationId?: string;
 	private googlePayClient?: GooglePayment;

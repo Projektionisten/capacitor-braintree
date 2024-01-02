@@ -1,6 +1,6 @@
 {
-  "name": "@projektionisten/capacitor-braintree-sdk",
-  "version": "0.0.2",
+  "name": "@projektionisten/capacitor-braintree",
+  "version": "0.0.3-dev1",
   "description": "The Braintree API provides methods for sharing content in any sharing-enabled apps the user may have installed.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "ProjektionistenCapacitorBraintreeSdk.podspec"
+    "ProjektionistenCapacitorBraintree.podspec"
   ],
   "author": "Projektionisten GmbH <developer@projektionisten.de>",
   "license": "MIT",
@@ -36,12 +36,12 @@
     "fmt": "npm run eslint -- --fix && npm run swiftlint -- --fix --format",
     "eslint": "eslint . --ext ts",
     "swiftlint": "node-swiftlint",
-    "docgen": "docgen --api BraintreeSDKPlugin --output-readme README.md --output-json dist/docs.json",
+    "docgen": "docgen --api BraintreePlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "publish:cocoapod": "pod trunk push ./ProjektionistenCapacitorBraintreeSdk.podspec --allow-warnings"
+    "publish:cocoapod": "pod trunk push ./ProjektionistenCapacitorBraintree.podspec --allow-warnings"
   },
   "devDependencies": {
     "@capacitor/android": "^5.0.0",
@@ -77,7 +77,8 @@
     }
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "packageManager": "yarn@4.0.2",
   "dependencies": {

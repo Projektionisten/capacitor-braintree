@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONException;
 
-@CapacitorPlugin(name = "BraintreeSDK")
-public class BraintreeSDKPlugin extends Plugin implements PayPalListener, GooglePayListener {
+@CapacitorPlugin(name = "Braintree")
+public class BraintreePlugin extends Plugin implements PayPalListener, GooglePayListener {
 
-    private static final String TAG = "BraintreeSDKPlugin";
+    private static final String TAG = "BraintreePlugin";
 
     private BraintreeClient braintreeClient;
     private PayPalClient payPalClient;

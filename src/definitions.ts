@@ -205,7 +205,7 @@ export interface PaymentMethodReadyResult {
 	ready: boolean;
 }
 
-export interface BraintreeSDKPlugin {
+export interface BraintreePlugin {
 	/**
 	 * This updates the plugin with a new auth token.
 	 *

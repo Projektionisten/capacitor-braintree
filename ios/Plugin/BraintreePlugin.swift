@@ -2,8 +2,8 @@ import Foundation
 import Braintree
 import Capacitor
 
-@objc(BraintreeSDK)
-public class BraintreeSDK: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate {
+@objc(Braintree)
+public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate {
 
     private var braintreeClient: BTAPIClient?
     private var currentPluginCall: CAPPluginCall?

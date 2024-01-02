@@ -17,5 +17,5 @@
     "target": "es2017",
     "skipLibCheck": true,
   },
-  "files": ["src/index.ts", "src/types.d.ts"],
+  "files": ["src/index.ts"],
 }

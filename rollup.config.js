@@ -7,6 +7,7 @@ export default {
       name: 'capacitorBraintree',
       globals: {
         '@capacitor/core': 'capacitorExports',
+        'braintree-web': 'BraintreeWeb'
       },
       sourcemap: true,
       inlineDynamicImports: true,
@@ -18,5 +19,5 @@ export default {
       inlineDynamicImports: true,
     },
   ],
-  external: ['@capacitor/core'],
+  external: ['@capacitor/core', 'braintree-web'],
 };

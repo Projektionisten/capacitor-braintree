@@ -1,10 +1,10 @@
 import { registerPlugin } from '@capacitor/core';
 
-import type { BraintreeSDKPlugin } from './definitions';
+import type { BraintreePlugin } from './definitions';
 
-const BraintreeSDK = registerPlugin<BraintreeSDKPlugin>('BraintreeSDK', {
-	web: () => import('./web').then((m) => new m.BraintreeSDKWeb())
+const Braintree = registerPlugin<BraintreePlugin>('Braintree', {
+	web: () => import('./web').then((m) => new m.BraintreeWeb())
 });
 
 export * from './definitions';
-export { BraintreeSDK };
+export { Braintree };
