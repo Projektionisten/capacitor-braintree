@@ -1,6 +1,6 @@
 # @projektionisten/capacitor-braintree
 
-The Braintree Drop-in UI is a self contained overlay for using different types of payment providers in your app.
+[Braintree](https://developer.paypal.com/braintree/docs/guides/overview) is a payment platform many developers use to facilitate specifically paypal payments in their apps, but other payment methods like Google/Apple Pay and credit cards are available through the Braintree SDK. This [Capacitor](https://capacitorjs.com/) plugin is meant to provide ways to use that SDK for different platforms through a web app
 
 ## Install
 
