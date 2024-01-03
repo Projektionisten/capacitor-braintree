@@ -31,8 +31,8 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
 	 */
     @objc func startPaypalPayment(_ call: CAPPluginCall) {
 
-        if self.braintreeClient != nil {
-            let payPalDriver = BTPayPalDriver(apiClient: self.braintreeClient)
+        if let braintreeClient = braintreeClient {
+            let payPalDriver = BTPayPalDriver(apiClient: braintreeClient)
 
             var flowType: String = "checkout"
             if let flowOption: String = call.getString("paymentFlow") {
@@ -136,8 +136,8 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
      * Constructs a payment request to use for a new transaction
      */
     func setupApplePayPaymentRequest(completion: @escaping (PKPaymentRequest?, Error?) -> Void) {
-        if self.braintreeClient != nil {
-            let applePayClient = BTApplePayClient(apiClient: self.braintreeClient)
+        if let braintreeClient = braintreeClient {
+            let applePayClient = BTApplePayClient(apiClient: braintreeClient)
 
             applePayClient.paymentRequest { (paymentRequest, error) in
                 guard let paymentRequest = paymentRequest else {
@@ -163,12 +163,12 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
                                                    didAuthorizePayment payment: PKPayment,
                                                    handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
 
-        let applePayClient = BTApplePayClient(apiClient: self.braintreeClient)
+        let applePayClient = BTApplePayClient(apiClient: self.braintreeClient!)
         // Tokenize the Apple Pay payment
         applePayClient.tokenizeApplePay(payment) { (token, error) in
             if let error = error {
                 // Received an error from Braintree.
-                self.currentPluginCall.reject("Error in apple payment tokenization:" + error.localizedDescription)
+                self.currentPluginCall!.reject("Error in apple payment tokenization:" + error.localizedDescription)
                 completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
                 return
             }
@@ -180,13 +180,13 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
                 // Then indicate success or failure based on the server side result of Transaction.sale
                 // via the completion callback.
                 // e.g. If the Transaction.sale was successful
-                self.currentPluginCall.resolve([
+                self.currentPluginCall!.resolve([
                     "nonce": token.nonce,
                     "userCancelled": false
                 ])
                 completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
             } else {
-                self.currentPluginCall.resolve([
+                self.currentPluginCall!.resolve([
                     "userCancelled": false
                 ])
                 completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
