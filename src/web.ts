@@ -184,20 +184,20 @@ export class BraintreeWeb extends WebPlugin implements BraintreePlugin {
 			});
 
 			const paypalTokenizeResult: PayPalTokenizePayload =
-        await paypalClient.tokenize({
-        	flow:
-            options.paymentFlow === PAYPAL_PAYMENT_FLOW.VAULT
-            	? 'vault'
-            	: 'checkout',
-        	locale: 'de_DE',
-        	amount: options.amount,
-        	currency: 'EUR',
-        	useraction:
-            options.userAction === PAYPAL_USER_ACTION.COMMIT
-            	? 'commit'
-            	: undefined,
-        	billingAgreementDescription: options.primaryDescription ?? ''
-        });
+			await paypalClient.tokenize({
+				flow:
+				options.paymentFlow === PAYPAL_PAYMENT_FLOW.VAULT
+					? 'vault'
+					: 'checkout',
+				locale: 'de_DE',
+				amount: options.amount,
+				currency: 'EUR',
+				useraction:
+				options.userAction === PAYPAL_USER_ACTION.COMMIT
+					? 'commit'
+					: undefined,
+				billingAgreementDescription: options.primaryDescription ?? ''
+			});
 
 			return Promise.resolve({
 				userCancelled: false,
