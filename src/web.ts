@@ -208,28 +208,26 @@ export class BraintreeWeb extends WebPlugin implements BraintreePlugin {
 				}
 			});
 		} catch (error: unknown) {
+			const braintreeError: BraintreeError = error as BraintreeError;
 
-			if (error instanceof Error) {
+			if (braintreeError.code) {
 				switch ((error as BraintreeError).code) {
 					case 'PAYPAL_POPUP_CLOSED':
-						console.error('Customer closed PayPal popup.');
-						break;
+						return Promise.reject('Customer closed PayPal popup.');
 					case 'PAYPAL_ACCOUNT_TOKENIZATION_FAILED':
-						console.error('PayPal tokenization failed. See details:', (error as BraintreeError).details);
-						break;
+						return Promise.reject('PayPal tokenization failed. See details:' + JSON.stringify(braintreeError.details));
 					case 'PAYPAL_FLOW_FAILED':
-						console.error('Unable to initialize PayPal flow. Are your options correct?', (error as BraintreeError).details);
-						break;
+						return Promise.reject('Unable to initialize PayPal flow. Are your options correct? '
+							+ JSON.stringify(braintreeError.details));
 					default:
-						throw new Error('Error in paypal checkout: ' + error.message);
+						return Promise.reject('Error in paypal checkout: ' + braintreeError.message);
 				}
 			} else {
-				throw new Error('Error in paypal checkout: ' + error);
+				return Promise.reject('Error in paypal checkout: ' + error);
 			}
 
 		}
 
-		return Promise.reject();
 	}
 
 	/**
