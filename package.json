@@ -1,6 +1,6 @@
 {
   "name": "@projektionisten/capacitor-braintree",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "The Braintree API provides methods for sharing content in any sharing-enabled apps the user may have installed.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@capacitor/android": "^6.0.0",
     "@capacitor/core": "^6.0.0",
-    "@capacitor/docgen": "0.2.0",
+    "@capacitor/docgen": "0.3.0",
     "@capacitor/ios": "^6.0.0",
     "@ionic/eslint-config": "^0.4.0",
     "@ionic/swiftlint-config": "^1.1.2",
