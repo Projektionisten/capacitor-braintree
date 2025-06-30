@@ -11,10 +11,10 @@ Pod::Spec.new do |s|
   s.author = package['author']
   s.source = { :git => 'https://bitbucket.org/projektionisten-developers/capacitor-braintree.git', :tag => package['name'] + '@' + package['version'] }
   s.source_files = 'ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}'
-  s.ios.deployment_target  = '13.0'
+  s.ios.deployment_target = '14.0'
   s.dependency 'Capacitor'
-  s.dependency 'Braintree'
-  s.dependency 'Braintree/ApplePay'
+  s.dependency 'Braintree', '~> 5.0'
+  s.dependency 'Braintree/ApplePay', '~> 5.0'
 
   s.swift_version = '5.1'
 end
