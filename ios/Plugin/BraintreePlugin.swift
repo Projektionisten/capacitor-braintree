@@ -1,4 +1,5 @@
 import Foundation
+import PassKit
 import Braintree
 import Capacitor
 
@@ -9,16 +10,13 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
     private var currentPluginCall: CAPPluginCall?
 
     /**
-	 * This updates the plugin with a new auth token.
-	 *
+     * This updates the plugin with a new auth token.
 	 * This needs to be called before the SDK can be used.
 	 */
     @objc func setClientToken(_ call: CAPPluginCall) {
         if let token: String = call.getString("token") {
-
             self.braintreeClient = BTAPIClient(authorization: token)
             call.resolve()
-
         } else {
             call.reject("A token is required.")
             return
@@ -26,71 +24,68 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
     }
 
     /**
-	 * Starts a transaction with the paypal sdk. Will open a seperate browser window or similar to complete and
+     * Starts a transaction with the paypal sdk. Will open a seperate browser window or similar to complete and
 	 * return with information about the used account and the payment nonce
 	 */
     @objc func startPaypalPayment(_ call: CAPPluginCall) {
 
-        if let braintreeClient = braintreeClient {
-            let payPalDriver = BTPayPalDriver(apiClient: braintreeClient)
-
-            var flowType: String = "checkout"
-            if let flowOption: String = call.getString("paymentFlow") {
-                flowType = flowOption
-            }
-
-            let paypalRequest: BTPayPalRequest
-            switch flowType {
-            case "vault":
-                paypalRequest = BTPayPalVaultRequest()
-                paypalRequest.billingAgreementDescription = call.getString("primaryDescription")
-                break
-            case "checkout":
-                fallthrough
-            default:
-                if let price: String = call.getString("amount") {
-                    paypalRequest = BTPayPalCheckoutRequest(amount: price)
-                    paypalRequest.billingAgreementDescription = call.getString("primaryDescription")
-                } else {
-                    call.reject("Transaction amount must be set for checkout process")
-                    return
-                }
-                break
-            }
-
-            payPalDriver.tokenizePayPalAccount(with: paypalRequest) { (tokenizedPayPalAccount, error) in
-                if let tokenizedPayPalAccount = tokenizedPayPalAccount {
-                    print("Got a nonce: (tokenizedPayPalAccount.nonce)")
-                    // Send payment method nonce to your server to create a transaction
-                    call.resolve([
-                        "nonce": tokenizedPayPalAccount.nonce,
-                        "userCancelled": false
-                    ])
-                } else if let error = error {
-                    call.reject("Error in paypal payment: " + error.localizedDescription)
-                } else {
-                    // Buyer canceled payment approval
-                    call.resolve([
-                        "userCancelled": true
-                    ])
-                }
-            }
-
-        } else {
+        guard let braintreeClient = braintreeClient else {
             call.reject("No client token was provided or the client was not initialized. Call 'setClientToken' first")
+            return
+        }
+        let payPalClient = BTPayPalClient(apiClient: braintreeClient)
+
+        var flowType: String = "checkout"
+        if let flowOption: String = call.getString("paymentFlow") {
+            flowType = flowOption
         }
 
+        let completionHandler: (BTPayPalAccountNonce?, Error?) -> Void = { (tokenizedPayPalAccount, error) in
+            if let tokenizedPayPalAccount = tokenizedPayPalAccount {
+                print("Got a nonce: \(tokenizedPayPalAccount.nonce)")
+                // Send payment method nonce to your server to create a transaction
+                call.resolve([
+                    "nonce": tokenizedPayPalAccount.nonce,
+                    "userCancelled": false
+                ])
+            } else if let error = error {
+                call.reject("Error in paypal payment: " + error.localizedDescription)
+            } else {
+                // Buyer canceled payment approval
+                call.resolve([
+                    "userCancelled": true
+                ])
+            }
+        }
+
+        switch flowType {
+        case "vault":
+            let request = BTPayPalVaultRequest()
+            if let description = call.getString("primaryDescription") {
+                request.billingAgreementDescription = description
+            }
+            payPalClient.tokenize(request, completion: completionHandler)
+        case "checkout":
+            fallthrough
+        default:
+            if let price: String = call.getString("amount") {
+                let request = BTPayPalCheckoutRequest(amount: price)
+                payPalClient.tokenize(request, completion: completionHandler)
+            } else {
+                call.reject("Transaction amount must be set for checkout process")
+                return
+            }
+        }
     }
 
     /**
-	 * Check if apple pay is available on this device
-	 */
+     * Check if apple pay is available on this device
+     */
     @objc func isApplePayReady(_ call: CAPPluginCall) {
         if PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: [PKPaymentNetwork.visa, PKPaymentNetwork.masterCard, PKPaymentNetwork.maestro]) {
             call.resolve([
                 "ready": true
             ])
-
         } else {
             call.resolve([
                 "ready": false
@@ -139,14 +134,14 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
         if let braintreeClient = braintreeClient {
             let applePayClient = BTApplePayClient(apiClient: braintreeClient)
 
-            applePayClient.paymentRequest { (paymentRequest, error) in
+            applePayClient.makePaymentRequest { (paymentRequest, error) in
                 guard let paymentRequest = paymentRequest else {
                     completion(nil, error)
                     return
                 }
 
                 // Set other PKPaymentRequest properties here
-                paymentRequest.merchantCapabilities = .capability3DS
+                paymentRequest.merchantCapabilities = PKMerchantCapability.capability3DS
                 completion(paymentRequest, nil)
             }
 
@@ -163,9 +158,15 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
                                                    didAuthorizePayment payment: PKPayment,
                                                    handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
 
-        let applePayClient = BTApplePayClient(apiClient: self.braintreeClient!)
+        guard let braintreeClient = self.braintreeClient else {
+             completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
+             return
+        }
+
+        let applePayClient = BTApplePayClient(apiClient: braintreeClient)
+
         // Tokenize the Apple Pay payment
-        applePayClient.tokenizeApplePay(payment) { (token, error) in
+        applePayClient.tokenize(payment) { (token, error) in
             if let error = error {
                 // Received an error from Braintree.
                 self.currentPluginCall!.reject("Error in apple payment tokenization:" + error.localizedDescription)
@@ -192,7 +193,6 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
                 completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
                 return
             }
-
         }
     }
 
@@ -202,5 +202,4 @@ public class Braintree: CAPPlugin, PKPaymentAuthorizationViewControllerDelegate 
     public func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
         controller.dismiss(animated: true)
     }
-
 }
